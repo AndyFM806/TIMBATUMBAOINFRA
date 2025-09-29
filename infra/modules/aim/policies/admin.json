@@ -1,0 +1,12 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    { "Effect": "Allow", "Action": ["lambda:*"], "Resource": "*" },
+    { "Effect": "Allow", "Action": ["rds:*", "rds-db:*"], "Resource": "*" },
+    { "Effect": "Allow", "Action": ["sqs:*"], "Resource": "*" },
+    { "Effect": "Allow", "Action": ["sns:*"], "Resource": "*" },
+    { "Effect": "Allow", "Action": ["ses:*"], "Resource": "*" },
+    { "Effect": "Allow", "Action": ["secretsmanager:*"], "Resource": "*" },
+    { "Effect": "Allow", "Action": ["logs:*", "cloudwatch:*"], "Resource": "*" }
+  ]
+}

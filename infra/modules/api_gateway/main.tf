@@ -1,55 +1,70 @@
-# API REST básico
 resource "aws_api_gateway_rest_api" "api" {
-  name = "${var.project}-${var.env}-api"
+  name        = "${var.project}-${var.env}-api"
+  description = "REST API for ${var.project}"
 }
 
-# /students/{studentId}/enrollments
+# Authorizer Cognito
+resource "aws_api_gateway_authorizer" "cognito_auth" {
+  name          = "cognito-${var.env}"
+  rest_api_id   = aws_api_gateway_rest_api.api.id
+  type          = "COGNITO_USER_POOLS"
+  provider_arns = [var.cognito_user_pool_arn]
+  identity_source = "method.request.header.Authorization"
+}
+
+# Recurso base + /users ... etc
+resource "aws_api_gateway_resource" "users" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  parent_id   = aws_api_gateway_rest_api.api.root_resource_id
+  path_part   = "users"
+}
+# GET /users -> UsersLambda
+resource "aws_api_gateway_method" "users_get" {
+  rest_api_id   = aws_api_gateway_rest_api.api.id
+  resource_id   = aws_api_gateway_resource.users.id
+  http_method   = "GET"
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.cognito_auth.id
+}
+resource "aws_api_gateway_integration" "users_get_integ" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  resource_id = aws_api_gateway_resource.users.id
+  http_method = aws_api_gateway_method.users_get.http_method
+  type        = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri         = var.users_lambda_arn
+}
+
+# Idem para /courses, /students, /uploadvoucher, /inscriptions, /payments (voy a mostrar uno más y replicas)
 resource "aws_api_gateway_resource" "students" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   parent_id   = aws_api_gateway_rest_api.api.root_resource_id
   path_part   = "students"
 }
-resource "aws_api_gateway_resource" "studentId" {
-  rest_api_id = aws_api_gateway_rest_api.api.id
-  parent_id   = aws_api_gateway_resource.students.id
-  path_part   = "{studentId}"
-}
-resource "aws_api_gateway_resource" "enrollments" {
-  rest_api_id = aws_api_gateway_rest_api.api.id
-  parent_id   = aws_api_gateway_resource.studentId.id
-  path_part   = "enrollments"
-}
-
-# ANY /students/{studentId}/enrollments  -> Lambda proxy
-resource "aws_api_gateway_method" "any_enrollments" {
+resource "aws_api_gateway_method" "students_post" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
-  resource_id   = aws_api_gateway_resource.enrollments.id
-  http_method   = "ANY"
-  authorization = "NONE"
+  resource_id   = aws_api_gateway_resource.students.id
+  http_method   = "POST"
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.cognito_auth.id
 }
-resource "aws_api_gateway_integration" "proxy_enrollments" {
-  rest_api_id             = aws_api_gateway_rest_api.api.id
-  resource_id             = aws_api_gateway_resource.enrollments.id
-  http_method             = aws_api_gateway_method.any_enrollments.http_method
-  type                    = "AWS_PROXY"
+resource "aws_api_gateway_integration" "students_post_integ" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  resource_id = aws_api_gateway_resource.students.id
+  http_method = aws_api_gateway_method.students_post.http_method
+  type        = "AWS_PROXY"
   integration_http_method = "POST"
-  uri = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${var.students_lambda_arn}/invocations"
+  uri         = var.students_lambda_arn
 }
 
-# Permiso para que API GW invoque la Lambda
-resource "aws_lambda_permission" "allow_apigw_students" {
-  statement_id  = "AllowAPIGatewayInvokeStudents"
-  action        = "lambda:InvokeFunction"
-  function_name = var.students_lambda_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
-}
-
-# Despliegue y stage
+# Deploy + Stage
 resource "aws_api_gateway_deployment" "deploy" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   triggers    = { redeploy = timestamp() }
-  lifecycle { create_before_destroy = true }
+  depends_on  = [
+    aws_api_gateway_integration.users_get_integ,
+    aws_api_gateway_integration.students_post_integ
+  ]
 }
 resource "aws_api_gateway_stage" "stage" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
@@ -57,4 +72,8 @@ resource "aws_api_gateway_stage" "stage" {
   stage_name    = var.env
 }
 
-output "rest_api_id" { value = aws_api_gateway_rest_api.api.id }
+# (Opcional) API Key
+resource "aws_api_gateway_api_key" "key" {
+  name = "${var.project}-${var.env}-apikey"
+  enabled = true
+}
