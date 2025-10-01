@@ -1,0 +1,432 @@
+/* === ESTILOS PROFESIONALES PRINCIPAL CON EFECTOS === */
+
+/* RESET Y FUENTE */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #ffffff;
+  color: #1E2A38;
+  scroll-behavior: smooth;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* === HEADER === */
+.header {
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  padding: 20px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo-img {
+  height: 55px;
+}
+
+.main-nav a {
+  margin-left: 20px;
+  text-decoration: none;
+  color: #1E2A38;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.main-nav a:hover {
+  color: #00A8CC;
+}
+
+/* === HERO === */
+.hero {
+  position: relative;
+  height: 500px;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  filter: brightness(0.5); /* oscurece para que el texto sea visible */
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+}
+
+.hero h1 {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.hero p {
+  font-size: 18px;
+  margin-bottom: 30px;
+  color: #eeeeee;
+}
+
+.btn-primario {
+  background-color: #00A8CC;
+  color: #ffffff;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primario:hover {
+  background-color: #007999;
+}
+
+/* === BENEFICIOS === */
+.beneficios {
+  padding: 80px 20px;
+  background-color: #f9f9f9;
+}
+
+.beneficios-grid {
+  display: flex;
+  gap: 30px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.beneficio {
+  background-color: #f5f8ff;
+  border-radius: 16px;
+  padding: 30px;
+  flex: 1 1 30%;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.icono-beneficio {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.beneficio h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.beneficio p {
+  color: #555;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* === SOBRE NOSOTROS === */
+.sobre-nosotros {
+  padding: 100px 20px 60px;
+  background-color: #ffffff;
+}
+
+.sobre-nosotros-grid {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.sobre-nosotros .texto {
+  flex: 1 1 50%;
+  text-align: left;
+}
+
+.sobre-nosotros .imagen {
+  flex: 1 1 40%;
+}
+
+.sobre-nosotros .imagen img {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.sobre-nosotros h2 {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1E2A38;
+  margin-bottom: 20px;
+}
+
+.sobre-nosotros p {
+  font-size: 18px;
+  color: #444;
+  max-width: 800px;
+  line-height: 1.8;
+}
+
+/* === GALERIA DE ESTILOS === */
+.galeria {
+  padding: 60px 20px;
+  background-color: #fff;
+  text-align: center;
+}
+
+.galeria h2 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 30px;
+  color: #1E2A38;
+}
+
+.estilos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.tarjeta-estilo {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: center;
+  padding: 15px;
+}
+
+.tarjeta-estilo img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.tarjeta-estilo h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1E2A38;
+}
+
+/* === CLASES === */
+.clases {
+  position: relative;
+  padding: 80px 20px 100px;
+  background: linear-gradient(to bottom, #eaf9fc 0%, #ffffff 100%);
+  text-align: center;
+  overflow: hidden;
+}
+
+.clases::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: #ffffff;
+  border-top-left-radius: 60% 100%;
+  border-top-right-radius: 60% 100%;
+  z-index: 1;
+}
+
+.seccion-titulo {
+  font-size: 32px;
+  margin-bottom: 40px;
+  font-weight: 700;
+  color: #1E2A38;
+}
+
+.grid-clases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+  position: relative;
+  z-index: 2;
+}
+
+/* === TESTIMONIOS === */
+.motivacion {
+  padding: 60px 20px;
+  background-color: #ffffff;
+  text-align: center;
+}
+
+.motivacion blockquote {
+  font-size: 18px;
+  color: #444;
+  font-style: italic;
+  max-width: 700px;
+  margin: auto;
+}
+
+.motivacion cite {
+  display: block;
+  margin-top: 10px;
+  font-weight: 600;
+  color: #1E2A38;
+}
+
+/* === FOOTER === */
+.footer {
+  background-color: #F3F3F3;
+  color: #333;
+  padding: 30px 0;
+  text-align: center;
+  font-size: 14px;
+  margin-top: auto;
+}
+
+.footer p {
+  margin: 6px 0;
+}
+
+/* === ANIMACIONES === */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .header-flex {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .main-nav a {
+    margin-left: 0;
+  }
+
+  .hero h1 {
+    font-size: 30px;
+  }
+
+  .hero p {
+    font-size: 16px;
+  }
+
+  .beneficios-grid {
+    flex-direction: column;
+  }
+
+  .sobre-nosotros-grid {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .sobre-nosotros .texto,
+  .sobre-nosotros .imagen {
+    flex: 1 1 100%;
+  }
+}
+
+.carrusel-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+  max-width: 100%;
+  padding: 0 20px;
+  margin-top: 40px;
+}
+
+.carrusel-viewport {
+  overflow: hidden;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.carrusel-track {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  will-change: transform;
+}
+
+.tarjeta-estilo {
+  flex: 0 0 33.33%;
+  max-width: 33.33%;
+  margin: 0 10px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: center;
+  padding: 15px;
+  transition: transform 0.3s;
+}
+
+.tarjeta-estilo:hover {
+  transform: translateY(-5px);
+}
+
+.tarjeta-estilo img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.tarjeta-estilo h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1E2A38;
+}
+
+.flecha {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: none;
+  font-size: 28px;
+  padding: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: background 0.3s ease;
+  z-index: 10;
+}
+
+.flecha:hover {
+  background-color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .tarjeta-estilo {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}

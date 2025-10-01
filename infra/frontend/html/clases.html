@@ -1,0 +1,293 @@
+<body>
+<style>
+  .btn-retroceder {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    padding: 8px 18px;
+    font-size: 16px;
+    background: #f3f3f3;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-retroceder:hover {
+    background: #e0e0e0;
+  }
+  body {
+    position: relative;
+  }
+</style>
+<a href="admin_panel.html" class="btn-retroceder">⬅ Volver</a>
+  <h1>Gestión de Clases</h1>
+
+  <!-- 📚 CLASES -->
+  <section class="seccion">
+    <h2>📚 Clases</h2>
+    <div class="bloque-formulario">
+      <form id="formClase">
+        <input type="hidden" id="claseId" />
+        <input type="text" id="claseNombre" placeholder="Nombre de la clase" required />
+        <input type="text" id="claseDescripcion" placeholder="Descripción" required />
+        <link rel="stylesheet" href="../css/clases.css">
+
+        <div class="grupo-botones">
+          <button type="button" onclick="resetClase()">➕ Nueva</button>
+          <button type="submit">💾 Guardar Clase</button>
+        </div>
+      </form>
+    </div>
+    <div class="tabla-scroll">
+      <table id="tablaClases"></table>
+    </div>
+  </section>
+
+  <!-- 🎯 NIVELES -->
+  <section class="seccion">
+    <h2>🎯 Niveles</h2>
+    <div class="bloque-formulario">
+      <form id="formNivel">
+        <input type="hidden" id="nivelId" />
+        <input type="text" id="nivelNombre" placeholder="Nombre del nivel" required />
+        <div class="grupo-botones">
+          <button type="button" onclick="resetNivel()">➕ Nueva</button>
+          <button type="submit">💾 Guardar Nivel</button>
+        </div>
+      </form>
+    </div>
+    <div class="tabla-scroll">
+      <table id="tablaNiveles"></table>
+    </div>
+  </section>
+
+    <!-- 🔀 CLASE-NIVEL-HORARIO -->
+      <h2>🔀 Clase-Nivel-Horario</h2>
+      <div class="grupo-botones">
+        <button onclick="abrirModalCrearClaseNivel()">➕ Nueva ClaseNivel</button>
+      </div>
+      <div class="tabla-scroll">
+        <table id="tablaClaseNivel"></table>
+      </div>
+
+
+  <!-- 🧍‍♂️ MODAL -->
+  <div id="modalAlumnosClase" class="modal" style="display: none;">
+    <div class="modal-contenido">
+      <span class="cerrar" onclick="cerrarModalAlumnos()">&times;</span>
+      <h2>Alumnos inscritos</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>DNI</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="tablaAlumnosClase"></tbody>
+      </table>
+    </div>
+  </div>
+
+<!-- Modal Crear ClaseNivel -->
+<div id="modalCrearClaseNivel" class="modal" style="display: none;">
+  <div class="modal-contenido">
+    <span class="cerrar" onclick="cerrarModalCrearClaseNivel()">&times;</span>
+    <h2>Clase Nivel</h2>
+
+    <form id="formCrearClaseNivel">
+      <div class="row">
+        <label>Clase:</label>
+        <select id="selectClase" required>
+        </select>
+
+        <label>Nivel:</label>
+        <select id="selectNivel" required></select>
+      </div>
+
+      <div class="row">
+        <label>Aula:</label>
+        <select id="selectAula" required></select>
+
+        <label>Distintivo:</label>
+        <input type="text" id="distintivo" placeholder="Ej: A1" required />
+      </div>
+
+      <div class="row">
+        <label>Precio (S/):</label>
+        <input type="number" id="precio" step="0.01" min="0" required />
+
+        <label>Aforo:</label>
+        <input type="number" id="aforo" min="1" required />
+      </div>
+
+      <div class="row">
+        <label>Estado:</label>
+        <select id="estado">
+          <option value="abierta">Abierta</option>
+          <option value="cerrada">Cerrada</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <label>Fecha de Inicio:</label>
+        <input type="date" id="fechaInicio" required min="" />
+        <label>Fecha de Fin:</label>
+        <input type="date" id="fechaFin" required min="" />
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            const fechaInicio = document.getElementById('fechaInicio');
+            const fechaFin = document.getElementById('fechaFin');
+
+            // Hoy para min de inicio
+            const hoy = new Date();
+            const yyyy = hoy.getFullYear();
+            const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+            const dd = String(hoy.getDate()).padStart(2, '0');
+            const minInicio = `${yyyy}-${mm}-${dd}`;
+            fechaInicio.min = minInicio;
+
+            // Mañana para min de fin
+            const manana = new Date(hoy);
+            manana.setDate(hoy.getDate() + 1);
+            const yyyy2 = manana.getFullYear();
+            const mm2 = String(manana.getMonth() + 1).padStart(2, '0');
+            const dd2 = String(manana.getDate()).padStart(2, '0');
+            const minFin = `${yyyy2}-${mm2}-${dd2}`;
+            fechaFin.min = minFin;
+
+            // Cuando cambia inicio, ajustar min de fin
+            fechaInicio.addEventListener('change', function() {
+              let inicio = fechaInicio.value;
+              if (inicio) {
+                // min de fin es el día siguiente a inicio
+                let inicioDate = new Date(inicio);
+                inicioDate.setDate(inicioDate.getDate() + 1);
+                let yyyy3 = inicioDate.getFullYear();
+                let mm3 = String(inicioDate.getMonth() + 1).padStart(2, '0');
+                let dd3 = String(inicioDate.getDate()).padStart(2, '0');
+                let minFin2 = `${yyyy3}-${mm3}-${dd3}`;
+                fechaFin.min = minFin2;
+                if (fechaFin.value && fechaFin.value <= inicio) {
+                  fechaFin.value = '';
+                }
+              } else {
+                fechaFin.min = minFin;
+              }
+            });
+
+            // Validar que inicio < fin
+            fechaFin.addEventListener('change', function() {
+              if (fechaInicio.value && fechaFin.value && fechaFin.value <= fechaInicio.value) {
+                alert('La fecha de fin debe ser posterior a la fecha de inicio.');
+                fechaFin.value = '';
+              }
+            });
+          });
+        </script>
+      </div>
+      <script>
+        // Establecer min de hoy para ambas fechas
+        document.addEventListener('DOMContentLoaded', function() {
+          const hoy = new Date();
+          const yyyy = hoy.getFullYear();
+          const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+          const dd = String(hoy.getDate()).padStart(2, '0');
+          const minFecha = `${yyyy}-${mm}-${dd}`;
+          const fechaInicio = document.getElementById('fechaInicio');
+          const fechaFin = document.getElementById('fechaFin');
+          fechaInicio.min = minFecha;
+          fechaFin.min = minFecha;
+
+          fechaInicio.addEventListener('change', function() {
+        fechaFin.min = fechaInicio.value;
+        if (fechaFin.value < fechaInicio.value) {
+          fechaFin.value = '';
+        }
+          });
+        });
+      </script>
+
+      <div class="row">
+        <label>Fecha de Cierre:</label>
+        <input type="date" id="fechaCierre" required />
+      </div>
+
+      <div class="row">
+        <strong>Selecciona un horario disponible:</strong>
+        <div id="contenedorTablasHorario" style="overflow-x:auto; margin-top:10px;"></div>
+        <div id="infoHorarioSeleccionado" style="margin-top:8px; font-weight:bold;"></div>
+      </div>
+      <div class="contenedor-boton-submit">
+        <button type="submit" class="btn-crear-clasenivel">Guardar ClaseNivel</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+<!-- Modal para selector de horario -->
+<div id="modalHorario" style="display:none;" class="modal">
+  <div class="modal-contenido">
+    <span class="cerrar-modal" onclick="cerrarSelectorHorario()">×</span>
+    <h3>Seleccionar Horario</h3>
+    <div id="contenedorTablasHorario"></div>
+    <br>
+    <button onclick="cerrarSelectorHorario()">Cerrar</button>
+  </div>
+</div>
+
+<style>
+ .contenedor-boton-submit {
+  margin-top: 24px;
+  text-align: center;
+  padding-bottom: 16px;
+}
+
+.btn-crear-clasenivel {
+  width: 320px;
+  height: 48px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(to right, #007bff, #0056d2);
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-crear-clasenivel:hover {
+  background: linear-gradient(to right, #0056d2, #003cb3);
+  box-shadow: 0 6px 16px rgba(0, 86, 210, 0.4);
+  transform: scale(1.02);
+}
+
+
+  .modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6); display: flex;
+    justify-content: center; align-items: center;
+    z-index: 1000;
+  }
+  .modal-contenido {
+    background: white; padding: 20px; border-radius: 8px;
+    max-height: 90vh; overflow-y: auto; width: 90%; max-width: 800px;
+  }
+  .cerrar-modal {
+    float: right; cursor: pointer; font-size: 22px;
+  }
+  table.horario-table {
+    border-collapse: collapse; width: 100%; margin-bottom: 20px;
+  }
+  table.horario-table th, table.horario-table td {
+    border: 1px solid #ccc; padding: 8px; text-align: center;
+  }
+  .celda-libre { background-color: #e2ffe2; cursor: pointer; }
+  .celda-ocupada { background-color: #ffcccc; cursor: not-allowed; }
+  .celda-seleccionada { background-color: #007bff; color: white; }
+</style>
+
+  <script src="../js/clases.js"></script>
+
+</body>

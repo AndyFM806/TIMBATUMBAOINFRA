@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Solicitudes de Cambio</title>
+  <link rel="stylesheet" href="../css/solicitudes.css">
+</head>
+<body>
+  <h2>Gestión de Solicitudes</h2>
+
+  <!-- Validación del nombre de usuario -->
+  <div id="verificacionUsuario">
+    <h3>Verifica tu nombre de usuario</h3>
+    <input type="text" id="inputNombreUsuario" placeholder="Ingresa tu usuario" />
+    <button onclick="verificarUsuario()">Acceder</button>
+  </div>
+
+  <!-- Contenido oculto hasta verificar usuario -->
+  <div id="seccionSolicitudes" style="display:none;">
+
+    <!-- Formulario para enviar solicitud -->
+    <section>
+      <h3>Enviar nueva solicitud</h3>
+      <form id="formSolicitud">
+        <label for="tipo">Tipo de solicitud:</label>
+        <select id="tipo" required>
+          <option value="CAMBIO_CONTRASENA">Cambio de contraseña</option>
+          <option value="CAMBIO_USUARIO">Cambio de usuario</option>
+          <option value="OTRO">Otro</option>
+        </select>
+
+        <label for="detalle">Detalle:</label>
+        <textarea id="detalle" required></textarea>
+
+        <button type="submit">Enviar</button>
+      </form>
+    </section>
+
+    <!-- Historial de solicitudes -->
+    <section>
+      <h3>Mis Solicitudes</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th>Respuesta</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody id="tablaSolicitudes"></tbody>
+      </table>
+    </section>
+  </div>
+
+  <p id="mensaje"></p>
+  <script src="../js/solicitudes.js"></script>
+</body>
+</html>

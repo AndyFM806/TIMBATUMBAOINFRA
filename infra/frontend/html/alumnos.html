@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestión de Alumnos</title>
+  <link rel="stylesheet" href="../css/alumnos.css">
+</head>
+<style>
+  .btn-retroceder {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    padding: 8px 18px;
+    font-size: 16px;
+    background: #f3f3f3;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-retroceder:hover {
+    background: #e0e0e0;
+  }
+  body {
+    position: relative;
+  }
+</style>
+<a href="admin_panel.html" class="btn-retroceder">⬅ Volver</a>
+<body>
+  <h1>Gestión de Alumnos</h1>
+
+  <!-- 🧾 Lista de Alumnos -->
+  <section class="seccion lista-alumnos">
+    <div class="encabezado-lista">
+      <h2>📋 Lista de Alumnos</h2>
+      <div class="acciones-superiores">
+        <button id="btnAbrirModalAlumno">➕ Nuevo</button>
+        <button id="btnMostrarAcciones">🧾 Acciones Manuales</button>
+      </div>
+    </div>
+
+    <div class="tabla-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Documento</th>
+            <th>Clases</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaAlumnos"></tbody>
+      </table>
+    </div>
+
+    <div class="paginacion">
+      <button id="btnAnterior">« Anterior</button>
+      <span id="paginaActual">1</span>
+      <button id="btnSiguiente">Siguiente »</button>
+    </div>
+  </section>
+
+  <!-- 🔁 Mover Alumno -->
+  <section id="formularioMovimiento" class="seccion" style="display:none;">
+    <h2>🔁 Mover Alumno entre Clases</h2>
+    <input type="hidden" id="moverId">
+    <label>Desde:</label>
+    <select id="desdeClaseSelect"></select>
+    <label>Hacia:</label>
+    <select id="haciaClaseSelect"></select>
+    <div class="grupo-botones">
+      <button id="btnMoverAlumno">Mover</button>
+      <button id="btnCancelarMovimiento">Cancelar</button>
+    </div>
+  </section>
+
+  <!-- ✏️ Editar Alumno -->
+  <section id="formularioEdicion" class="seccion" style="display:none;">
+    <h2>✏️ Editar Alumno</h2>
+    <input type="hidden" id="editarId">
+    <form id="form-editar-alumno" autocomplete="off" novalidate>
+      <div>
+        <label for="editarDni">DNI</label>
+        <input type="text" id="editarDni" placeholder="DNI" required pattern="^\d{8}$" maxlength="8" minlength="8" title="Debe ingresar exactamente 8 números" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,8); validarEdicionAlumno();">
+      </div>
+      <div>
+        <label for="editarNombre">Nombre completo</label>
+        <input type="text" id="editarNombre" placeholder="Nombre completo" required pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$" title="Solo letras y espacios" oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, ''); validarEdicionAlumno();">
+      </div>
+      <div>
+        <label for="editarCorreo">Correo electrónico</label>
+        <input type="email" id="editarCorreo" placeholder="Correo electrónico" required pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Ingrese un correo electrónico válido" oninput="validarEdicionAlumno();">
+      </div>
+      <div>
+        <label for="editarDireccion">Dirección</label>
+        <input type="text" id="editarDireccion" placeholder="Dirección" oninput="validarEdicionAlumno();">
+      </div>
+      <div class="grupo-botones">
+        <button id="btnActualizarAlumno" type="submit" disabled>Guardar Cambios</button>
+        <button id="btnCancelarEdicion" type="button">Cancelar</button>
+      </div>
+    </form>
+  </section>
+  <script>
+    function validarEdicionAlumno() {
+      const dni = document.getElementById('editarDni');
+      const nombre = document.getElementById('editarNombre');
+      const correo = document.getElementById('editarCorreo');
+      const direccion = document.getElementById('editarDireccion');
+      const btnGuardar = document.getElementById('btnActualizarAlumno');
+
+      // Validaciones
+      const dniValido = /^\d{8}$/.test(dni.value);
+      const nombreValido = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(nombre.value) && nombre.value.trim().length > 0;
+      const correoValido = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(correo.value);
+      // Dirección puede estar vacía, no es obligatoria
+
+      btnGuardar.disabled = !(dniValido && nombreValido && correoValido);
+    }
+
+    // Validar al cargar datos en el formulario de edición
+    document.getElementById('formularioEdicion').addEventListener('input', validarEdicionAlumno);
+
+    // Prevenir submit si no es válido
+    document.getElementById('form-editar-alumno').addEventListener('submit', function(e) {
+      validarEdicionAlumno();
+      if (document.getElementById('btnActualizarAlumno').disabled) {
+        e.preventDefault();
+      }
+    });
+  </script>
+
+  <!-- 📌 Inscripción alumno existente -->
+  <section id="formularioInscripcionExistente" class="seccion" style="display:none;">
+    <h2>📌 Inscribir Alumno Existente a Nueva Clase</h2>
+    <input type="hidden" id="inscribirAlumnoId">
+    <p><strong>Nombre:</strong> <span id="inscribirAlumnoNombre"></span></p>
+    <p><strong>DNI:</strong> <span id="inscribirAlumnoDni"></span></p>
+    <label for="claseNivelSelectExistente">Clase disponible:</label>
+    <select id="claseNivelSelectExistente"></select>
+    <div class="grupo-botones">
+      <button id="btnInscribirExistente">✅ Inscribir</button>
+      <button id="btnCancelarInscripcion">Cancelar</button>
+    </div>
+  </section>
+
+  <!-- 🧾 Acciones Manuales -->
+  <section class="seccion acciones-manuales" id="accionesManuales" style="display: none;">
+    <h2>🧾 Acciones Manuales</h2>
+    <input type="text" id="clienteIdCredito" placeholder="DNI (8 dígitos)" maxlength="8">
+    <input type="number" id="valorCredito" placeholder="Valor" step="0.01" min="0">
+    <div class="grupo-botones">
+      <button id="btnEmitirNotaCredito">Emitir Nota de Crédito</button>
+    </div>
+  </section>
+
+  <!-- 🔘 Modal de inscripción nuevo -->
+  <div class="modal" id="modalInscripcionAlumno">
+    <div class="modal-contenido">
+      <span class="cerrar" id="cerrarModalInscripcion">&times;</span>
+      <h2>➕ Inscribir Alumno Nuevo</h2>
+      <form id="form-registro" autocomplete="off" novalidate>
+        <!-- Paso 1: Datos personales -->
+        <div class="step active" id="datos-personales">
+          <div class="full-width">
+            <label for="nuevoDni">DNI</label>
+            <input id="nuevoDni" name="dni" required pattern="^\d{8}$" maxlength="8" minlength="8" title="Debe ingresar exactamente 8 números" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,8); validarInscripcionAlumno();" onblur="verificarClienteExistente(); validarInscripcionAlumno();">
+          </div>
+          <div>
+            <label for="nuevoNombre">Nombres</label>
+            <input id="nuevoNombre" name="nombres" required pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$" title="Solo letras y espacios" oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, ''); validarInscripcionAlumno();">
+          </div>
+          <div>
+            <label for="nuevoApellidos">Apellidos</label>
+            <input id="nuevoApellidos" name="apellidos" required pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$" title="Solo letras y espacios" oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, ''); validarInscripcionAlumno();">
+          </div>
+          <div>
+            <label for="nuevoCorreo">Correo</label>
+            <input id="nuevoCorreo" name="correo" type="email" required pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Ingrese un correo electrónico válido" oninput="validarInscripcionAlumno();">
+          </div>
+          <div>
+            <label for="nuevoDireccion">Dirección</label>
+            <input id="nuevoDireccion" name="direccion" oninput="validarInscripcionAlumno();">
+          </div>
+          <div class="full-width">
+            <label>Clase Seleccionada</label>
+            <select id="claseNivelSelect" name="claseNivelSelect" required onchange="validarInscripcionAlumno();"></select>
+          </div>
+          <div id="info-saldo" style="margin-top: 10px;"></div>
+          <div class="full-width">
+            <label for="codigoNotaCredito">¿Tienes un código de nota de crédito?</label>
+            <input id="codigoNotaCredito" name="codigoNotaCredito" placeholder="Opcional" oninput="validarInscripcionAlumno();">
+          </div>
+        </div>
+        <div class="grupo-botones">
+          <button type="submit" id="btnInscribirAlumno" disabled>Inscribir</button>
+          <button type="button" id="btnLimpiarInscripcion">Limpiar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function validarInscripcionAlumno() {
+      const dni = document.getElementById('nuevoDni');
+      const nombres = document.getElementById('nuevoNombre');
+      const apellidos = document.getElementById('nuevoApellidos');
+      const correo = document.getElementById('nuevoCorreo');
+      const clase = document.getElementById('claseNivelSelect');
+      const btn = document.getElementById('btnInscribirAlumno');
+
+      const dniValido = /^\d{8}$/.test(dni.value);
+      const nombresValido = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(nombres.value) && nombres.value.trim().length > 0;
+      const apellidosValido = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(apellidos.value) && apellidos.value.trim().length > 0;
+      const correoValido = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(correo.value);
+      const claseValida = clase && clase.value && clase.value !== "";
+
+      btn.disabled = !(dniValido && nombresValido && apellidosValido && correoValido && claseValida);
+    }
+
+    document.getElementById('form-registro').addEventListener('input', validarInscripcionAlumno);
+    document.getElementById('form-registro').addEventListener('change', validarInscripcionAlumno);
+
+    document.getElementById('form-registro').addEventListener('submit', function(e) {
+      validarInscripcionAlumno();
+      if (document.getElementById('btnInscribirAlumno').disabled) {
+        e.preventDefault();
+      }
+    });
+  </script>
+
+  <!-- JS -->
+  <script src="../js/alumnos.js"></script>
+ 
+
+    <script>
+    // Mostrar/Ocultar Modal de Inscripción
+    document.getElementById("btnAbrirModalAlumno").addEventListener("click", () => {
+      document.getElementById("modalInscripcionAlumno").classList.add("activo");
+    });
+
+    // Ocultar Modal al cerrar (si tienes un botón con id "cerrarModalInscripcion")
+    const cerrarBtn = document.getElementById("cerrarModalInscripcion");
+    if (cerrarBtn) {
+      cerrarBtn.addEventListener("click", () => {
+        document.getElementById("modalInscripcionAlumno").classList.remove("activo");
+      });
+    }
+
+    // Mostrar/Ocultar sección de Acciones Manuales
+    document.getElementById("btnMostrarAcciones").addEventListener("click", () => {
+      const seccion = document.getElementById("accionesManuales");
+      seccion.style.display = seccion.style.display === "none" ? "block" : "none";
+    });
+  </script>
+
+  <script>
+    document.getElementById("btnLimpiarInscripcion").addEventListener("click", () => {
+      document.getElementById("form-registro").reset();
+      document.getElementById("btnInscribirAlumno").disabled = true;
+    });
+  </script>
+</body>
+</html>
+
+

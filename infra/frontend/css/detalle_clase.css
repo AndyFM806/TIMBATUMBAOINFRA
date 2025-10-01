@@ -1,0 +1,159 @@
+/* === DETALLE CLASE CSS ADAPTADO === */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #ffffff;
+  color: #1E2A38;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  padding: 20px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logo-img {
+  height: 55px;
+}
+
+.detalle-clase {
+  text-align: center;
+  padding: 60px 20px;
+  background: linear-gradient(to bottom, #eaf9fc 0%, #ffffff 100%);
+  border-radius: 20px;
+  margin: 40px auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  max-width: 1200px;
+  width: 95%;
+  min-height: 600px;
+}
+
+.detalle-clase h2 {
+  font-size: 32px;
+  color: #00A8CC;
+  margin-bottom: 15px;
+}
+
+.detalle-clase p {
+  font-size: 17px;
+  color: #444;
+  margin-bottom: 40px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Tarjeta de fondo celeste */
+
+
+/* Contenedor de tarjetas en horizontal */
+.niveles {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 30px;
+  overflow-x: auto;
+  padding-bottom: 20px;
+  justify-content: center;
+}
+
+/* Cada tarjeta */
+.nivel-item {
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+  width: 300px;
+  min-height: 420px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+}
+
+.nivel-item:hover {
+  transform: translateY(-6px);
+}
+
+/* Imagen superior */
+.nivel-item img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+
+/* Contenido textual */
+.nivel-info {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+
+.nivel-info h4 {
+  font-size: 20px;
+  color: #00A8CC;
+  margin-bottom: 8px;
+}
+
+.nivel-info .horario {
+  color: #444;
+  margin-bottom: 5px;
+}
+
+.nivel-info .precio {
+  color: #00A8CC;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.btn-inscribirse {
+  background-color: #00A8CC;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 13px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  align-self: center;
+}
+
+.btn-inscribirse:hover {
+  background-color: #007fa3;
+}
+
+
+
+.footer {
+  background-color: #F3F3F3;
+  color: #333;
+  padding: 30px 0;
+  text-align: center;
+  font-size: 14px;
+  margin-top: auto;
+}
+
+.footer .container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}

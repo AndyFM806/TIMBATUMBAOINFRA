@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inscripción - Timba Tumbao</title>
+  <link rel="stylesheet" href="../css/registro.css">
+</head>
+<style>
+  .btn-retroceder {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    padding: 8px 18px;
+    font-size: 16px;
+    background: #f3f3f3;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-retroceder:hover {
+    background: #e0e0e0;
+  }
+  body {
+    position: relative;
+  }
+</style>
+<a href="admin_panel.html" class="btn-retroceder">⬅ Volver</a>
+<body>
+
+  <header class="header">
+    <div class="container header-flex">
+      <img src="../img/lg.png" alt="Logo Timba Tumbao" class="logo-img">
+    </div>
+  </header>
+
+  <section class="formulario-registro">
+    <div class="container">
+      <h2>Inscripción</h2>
+
+      <!-- Barra de progreso -->
+      <div class="progress-bar">
+        <div id="step1" class="active">1. Datos</div>
+        <div id="step2">2. Pago</div>
+        <div id="step3">3. Confirmación</div>
+      </div>
+
+             <form id="form-registro">
+              <!-- Paso 1: Datos personales -->
+              <div class="step active" id="datos-personales">
+                <div class="full-width">
+                  <label for="dni">DNI</label>
+                  <input id="dni" name="dni" required pattern="^\d{8}$" maxlength="8" minlength="8" title="Debe ingresar exactamente 8 números" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,8);" onblur="verificarClienteExistente()">
+                </div>
+                <div>
+                  <label for="nombres">Nombres</label>
+                  <input id="nombres" name="nombres" required pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$" title="Solo letras y espacios" oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '')">
+                </div>
+                <div>
+                  <label for="apellidos">Apellidos</label>
+                  <input id="apellidos" name="apellidos" required pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$" title="Solo letras y espacios" oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '')">
+                </div>
+                <div>
+                  <label for="correo">Correo</label>
+                  <input id="correo" name="correo" type="email" required pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Ingrese un correo electrónico válido">
+                </div>
+                <div>
+                  <label for="direccion">Dirección</label>
+                  <input id="direccion" name="direccion">
+                </div>
+                <div class="full-width">
+                  <label>Clase Seleccionada</label>
+                  <input id="clase-seleccionada" disabled>
+                </div>
+                <div id="info-saldo" style="margin-top: 10px;"></div>
+                <div class="full-width">
+                  <label for="codigoNotaCredito">¿Tienes un código de nota de crédito?</label>
+                  <input id="codigoNotaCredito" name="codigoNotaCredito" placeholder="Opcional">
+                </div>
+
+                <!-- Sección de Términos y Condiciones -->
+                <div class="full-width" style="margin-top: 10px;">
+                  <label style="display: inline-flex; align-items: center; gap: 6px; font-weight: normal; flex-wrap: nowrap;">
+                    <input type="checkbox" id="aceptoTerminos" name="aceptoTerminos" required style="margin:0;" onchange="document.getElementById('btn-siguiente').disabled = !this.checked;">
+                    <span style="white-space: nowrap;">
+                      Acepto los términos y condiciones
+                      <button type="button" onclick="mostrarTerminos(event)" style="margin-left:6px; font-size:12px; padding:2px 8px; vertical-align:middle;">Ver</button>
+                    </span>
+                  </label>
+                </div>
+
+                <button type="button" id="btn-siguiente" class="btn-primario" onclick="registrarPaso1()" disabled>Siguiente</button>
+              </div>
+            </form>
+
+
+        <!-- Paso 2: Pago -->
+        <div class="step" id="pago">
+          <div class="comprobante">
+            <h3>Escanea el código QR con Yape</h3>
+            <img src="../img/qryape.png" class="qr" alt="QR Yape">
+            <p><strong>Yape:</strong> 912-154-658</p>
+            <p><strong>BCP:</strong> 57005815643040</p>
+          </div>
+
+          <div class="full-width">
+            <label for="comprobante">Adjunta tu comprobante </label>
+            <input type="file" id="comprobante" accept="image/jpeg">
+          </div>
+
+          <div class="full-width">
+            <button type="button" class="btn-primario" onclick="subirComprobante()">Confirmar con Comprobante</button>
+            <button type="button" class="btn-primario" onclick="pagarConPasarela()">Pagar en Línea</button>
+          </div>
+        </div>
+
+        <!-- Paso 3: Confirmación -->
+        <div class="step" id="confirmacion">
+          <div class="comprobante">
+            <h3>¡Estado de Inscripción!</h3>
+            <p id="mensaje-confirmacion">Tu inscripción está en espera de aprobación.</p>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Av. Húsares de Junín 1164, Trujillo | 982 179 572 | Instagram: @TimbaTumbao</p>
+      <p>&copy; 2025 Timba Tumbao - Todos los derechos reservados.</p>
+    </div>
+  </footer>
+  <script>
+  function mostrarTerminos(event) {
+    event.preventDefault();
+    // Crear el modal si no existe
+    if (!document.getElementById('modalTerminos')) {
+      const modal = document.createElement('div');
+      modal.id = 'modalTerminos';
+      modal.className = 'modal';
+      modal.style.display = 'none';
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100%';
+      modal.style.height = '100%';
+      modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+      modal.style.zIndex = '999';
+
+      modal.innerHTML = `
+        <div style="background:white; margin:10% auto; padding:20px; width:90%; max-width:600px; border-radius:10px; position:relative;">
+          <h3>Términos y Condiciones</h3>
+          <p style="max-height:300px; overflow-y:auto;">
+            <strong>1. Inscripción y Datos Personales</strong><br>
+            Los datos proporcionados (DNI, nombres, apellidos, correo electrónico, dirección) serán utilizados exclusivamente para gestionar su inscripción, emitir comprobantes, enviar notificaciones y validar su participación en las clases.<br>
+            Al enviar su inscripción, autoriza a Timba Tumbao a comunicarse por correo electrónico con fines informativos y administrativos relacionados con su participación.<br><br>
+            <strong>2. Pago y Confirmación</strong><br>
+            Una vez registrada su inscripción, podrá realizar el pago mediante:<br>
+            - Subida de comprobante de pago (JPG)<br>
+            - Pasarela de pagos (Mercado Pago), en modo seguro y en línea.<br>
+            Su inscripción quedará en estado <em>pendiente</em> hasta que el equipo administrativo valide su comprobante o se confirme automáticamente el pago por pasarela.<br>
+            Al completar el pago, recibirá una confirmación al correo electrónico registrado.<br><br>
+            <strong>3. Nota de Crédito</strong><br>
+            Si posee una nota de crédito vigente, puede ingresarla durante la inscripción.<br>
+            El sistema aplicará automáticamente su valor al precio de la clase. Si la nota no cubre el total, podrá pagar la diferencia con comprobante o pasarela.<br>
+            Las notas de crédito son personales, intransferibles y tienen una vigencia máxima de 6 meses o según indicación administrativa.<br><br>
+            <strong>4. Condiciones de Cupo y Cancelación</strong><br>
+            Las clases tienen cupo limitado. El sistema bloqueará nuevas inscripciones al alcanzarse el máximo de participantes.<br>
+            Timba Tumbao se reserva el derecho de cancelar clases que no alcancen el mínimo requerido de inscritos. En dicho caso, se emitirá una nota de crédito para futuras inscripciones.<br>
+            No se realizarán devoluciones monetarias, salvo por errores administrativos comprobados.<br><br>
+            <strong>5. Responsabilidad y Conducta</strong><br>
+            El alumno se compromete a respetar el reglamento de la academia y asistir puntualmente a las clases.<br>
+            Cualquier conducta inapropiada puede generar suspensión sin derecho a reembolso.<br><br>
+            <strong>6. Protección de Datos</strong><br>
+            Sus datos serán tratados conforme a la Ley N.º 29733 (Ley de Protección de Datos Personales del Perú).<br>
+            No compartiremos su información con terceros sin su consentimiento.<br><br>
+            <strong>Contacto:</strong> Para dudas o consultas, puede escribir a <a href="mailto:timbatumbao.contacto@gmail.com">timbatumbao.contacto@gmail.com</a><br>
+          </p>
+          <button onclick="cerrarModalTerminos()" style="margin-top:10px;">Cerrar</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+    document.getElementById('modalTerminos').style.display = 'block';
+  }
+
+  function cerrarModalTerminos() {
+    const modal = document.getElementById('modalTerminos');
+    if (modal) modal.style.display = 'none';
+  }
+  </script>
+
+  <script src="../js/registro.js"></script>
+</body>
+</html>

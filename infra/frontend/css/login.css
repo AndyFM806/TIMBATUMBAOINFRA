@@ -1,0 +1,85 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to bottom, #eaf9fc 0%, #ffffff 100%);
+  font-family: 'Segoe UI', sans-serif;
+  color: #1E2A38;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.login-container {
+  background-color: #ffffff;
+  padding: 40px 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.login-container h2 {
+  margin-bottom: 25px;
+  color: #00A8CC;
+}
+
+.login-container h3 {
+  margin-top: 40px;
+  font-size: 16px;
+  color: #1E2A38;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 12px 14px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+textarea {
+  resize: vertical;
+}
+
+button {
+  width: 100%;
+  background-color: #00A8CC;
+  color: white;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #007fa3;
+}
+
+.recuperar {
+  color: #00A8CC;
+  margin-top: 15px;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.mensaje {
+  font-size: 14px;
+  margin-top: 20px;
+  font-weight: bold;
+  color: #e53935;
+}
+
+/* Secciones ocultas */
+.seccion-oculta {
+  display: none;
+  margin-top: 25px;
+}

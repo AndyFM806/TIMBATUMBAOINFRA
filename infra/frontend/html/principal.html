@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timba Tumbao - Academia de Baile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/principal.css">
+</head>
+
+
+<body>
+  <div class="page-wrapper">
+    <header class="header">
+    <div class="container header-flex">
+      <a href="principal.html">
+        <img src="../img/lg.png" alt="Logo Timba Tumbao" class="logo-img">
+      </a>
+      <nav class="main-nav">
+        <a href="#clases">Clases</a>
+        <a href="#nosotros">Nosotros</a>
+        <a href="/html/login.html" class="btn-ingresar">Ingresar</a>
+      </nav>
+    </div>
+  </header>
+
+    <section class="hero">
+      <img src="../img/CABECERA.png" alt="Fondo hero" class="hero-bg">
+      <div class="container hero-content">
+        <h1>Descubre el ritmo que transforma tu vida.</h1>
+        <p>Clases presenciales con los mejores instructores. Vive la danza con pasión.</p>
+        <a href="#clases" class="btn-primario">Explorar clases</a>
+      </div>
+    </section>
+
+    <section class="beneficios">
+      <div class="container beneficios-grid">
+        <div class="beneficio">
+          <div class="icono-beneficio">⭐</div>
+          <h3>Instructores expertos</h3>
+          <p>Profesionales certificados en diversos estilos de baile.</p>
+        </div>
+        <div class="beneficio">
+          <div class="icono-beneficio">🎵</div>
+          <h3>Ambiente motivador</h3>
+          <p>Música, energía positiva y un espacio donde bailar es alegría.</p>
+        </div>
+        <div class="beneficio">
+          <div class="icono-beneficio">🕺</div>
+          <h3>Variedad de estilos</h3>
+          <p>Desde salsa, bachata y hip-hop hasta ritmos modernos como K-pop.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="sobre-nosotros" id="nosotros">
+      <div class="container sobre-nosotros-grid">
+        <div class="texto">
+          <h2>Sobre Nosotros</h2>
+          <p>Somos una academia comprometida con tu formación artística, ofreciendo clases de diferentes estilos de danza para todas las edades y niveles. Únete a nuestra comunidad y vive el arte del movimiento.</p>
+        </div>
+        <div class="imagen">
+          <img src="../img/SOBRE NOSOTROS.png" alt="Personas bailando">
+        </div>
+      </div>
+    </section>
+
+    <section class="galeria">
+      <div class="container">
+        <h2>Estilos de danza</h2>
+      </div>
+
+      <div class="carrusel-container">
+        <button class="flecha izquierda" onclick="moverCarrusel(-1)">&#10094;</button>
+        <div class="carrusel-viewport">
+          <div class="carrusel-track" id="carrusel-track">
+            <div class="tarjeta-estilo">
+              <img src="/img/salsa.png" alt="Salsa">
+              <h3>Salsa</h3>
+            </div>
+            <div class="tarjeta-estilo">
+              <img src="/img/bachata.png" alt="Bachata">
+              <h3>Bachata</h3>
+            </div>
+            <div class="tarjeta-estilo">
+              <img src="/img/hiphop.png" alt="Hip-Hop">
+              <h3>Hip-Hop</h3>
+            </div>
+            <div class="tarjeta-estilo">
+              <img src="/img/kpop.png" alt="K-Pop">
+              <h3>K-Pop</h3>
+            </div>
+          </div>
+        </div>
+        <button class="flecha derecha" onclick="moverCarrusel(1)">&#10095;</button>
+      </div>
+    </section>
+
+    <section class="motivacion">
+      <div class="container">
+        <blockquote>
+          "La danza es el lenguaje oculto del alma."
+          <cite>— Martha Graham, bailarina y coreógrafa estadounidense </cite>
+        </blockquote>
+      </div>
+    </section>
+
+    <section id="clases" class="clases">
+      <div class="container">
+        <h2 class="seccion-titulo">GENEROS</h2>
+        <div class="grid-clases" id="lista-clases">
+          <!-- Clases se insertan con JS -->
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container">
+        <p>Av. Húsares de Junín 1164, Trujillo | 982 179 572 | Instagram: @TimbaTumbao</p>
+        <p>&copy; 2025 Timba Tumbao - Todos los derechos reservados.</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    let index = 0;
+    function moverCarrusel(direccion) {
+      const track = document.getElementById('carrusel-track');
+      const total = track.children.length;
+      const maxIndex = total - 3; // asumiendo 3 visibles
+      index += direccion;
+      if (index < 0) index = 0;
+      if (index > maxIndex) index = maxIndex;
+      track.style.transform = `translateX(-${index * 33.33}%)`;
+    }
+  </script>
+  <script src="../js/principal.js"></script>
+</body>
+</html>

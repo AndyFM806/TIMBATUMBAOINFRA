@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gestión de Inscripciones</title>
+  <link rel="stylesheet" href="../css/inscripciones.css" />
+</head>
+<style>
+  .btn-retroceder {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    padding: 8px 18px;
+    font-size: 16px;
+    background: #f3f3f3;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-retroceder:hover {
+    background: #e0e0e0;
+  }
+  body {
+    position: relative;
+  }
+</style>
+<a href="admin_panel.html" class="btn-retroceder">⬅ Volver</a>
+<body>
+  <h1>Gestión de Inscripciones</h1>
+
+  <div class="tabs">
+    <button onclick="cargarPorEstado('todos')">📋 Todas</button>
+    <button onclick="cargarPorEstado('pendiente')">🕓 Pendientes</button>
+    <button onclick="cargarPorEstado('aprobada')">✅ Aprobadas</button>
+    <button onclick="cargarPorEstado('rechazada')">❌ Rechazadas</button>
+    <button onclick="verConComprobante()">📄 Con Comprobante</button>
+    <button onclick="verConDiferencia()">💰 Con Diferencia</button>
+  </div>
+
+  <div class="busqueda">
+    <input type="text" id="buscarTexto" placeholder="Buscar por DNI" />
+    <button onclick="buscar()">🔍 Buscar</button>
+  </div>
+
+  <div id="panel">
+    <table>
+      <thead>
+        <tr>
+            <th>Cliente</th>
+            <th>DNI</th>
+            <th>Clase - Nivel</th>
+            <th>Precio</th>
+            <th>Estado</th>
+            <th>Comprobante</th>
+            <th>Fecha</th> <!-- NUEVA COLUMNA -->
+            <th>Acciones</th>
+        </tr>
+        </thead>
+
+      <tbody id="contenidoTabla">
+        <!-- Se carga dinámicamente -->
+      </tbody>
+    </table>
+  </div>
+
+  <script src="../js/inscripciones.js"></script>
+
+</body>
+</html>

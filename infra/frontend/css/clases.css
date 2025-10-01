@@ -1,0 +1,156 @@
+/* === RESET GLOBAL === */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to bottom, #eaf9fc 0%, #ffffff 100%);
+  color: #1E2A38;
+  min-height: 100vh;
+}
+
+/* === TITULOS === */
+h1 {
+  text-align: center;
+  color: #00A8CC;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+h2 {
+  color: #1E2A38;
+  margin-bottom: 20px;
+}
+
+/* === SECCIONES === */
+.seccion {
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+  padding: 30px;
+  margin: 30px auto;
+  width: 90%;
+  max-width: 1000px;
+}
+
+/* === FORMULARIOS === */
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+input, select {
+  flex: 1 1 200px;
+  padding: 10px 14px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+button {
+  background-color: #00A8CC;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #007fa3;
+}
+
+/* === TABLAS === */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+table th, table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+table th {
+  background-color: #00A8CC;
+  color: white;
+}
+
+table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* === MODAL === */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-contenido {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.modal-contenido h2 {
+  margin-top: 0;
+  color: #00A8CC;
+}
+
+.cerrar {
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.cerrar:hover {
+  color: #00A8CC;
+}
+table.horario-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+}
+.horario-table th, .horario-table td {
+  border: 1px solid #ccc;
+  padding: 6px;
+  text-align: center;
+}
+.celda-libre {
+  background-color: #e2ffe2;
+  cursor: pointer;
+}
+.celda-ocupada {
+  background-color: #ffcccc;
+  cursor: not-allowed;
+}
+.celda-libre:hover {
+  background-color: #bbffbb;
+}
+.celda-seleccionada {
+  background-color: #007bff;
+  color: white;
+}

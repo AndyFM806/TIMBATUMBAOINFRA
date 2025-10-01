@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inicio de Sesión - Timba Tumbao</title>
+  <link rel="stylesheet" href="../css/login.css" />
+</head>
+
+<body>
+  <div class="login-container">
+    <h2>Iniciar Sesión</h2>
+
+    <form id="formLogin">
+      <input type="text" id="username" placeholder="Usuario" required />
+      <input type="password" id="password" placeholder="Contraseña" required />
+      <button type="submit">Ingresar</button>
+    </form>
+
+    <p class="recuperar" onclick="mostrarRecuperacion()">¿Olvidaste tu contraseña?</p>
+
+    <!-- Recuperación (admin + recepcionista) -->
+    <div id="recuperacion" class="seccion-oculta">
+      <h3>Recuperación de contraseña (Administrador)</h3>
+      <button onclick="solicitarCodigo()">Solicitar código</button>
+      <input type="text" id="codigoRecuperacion" placeholder="Código recibido" />
+      <input type="password" id="nuevaContrasena" placeholder="Nueva contraseña" />
+      <button onclick="validarCodigo()">Restablecer contraseña</button>
+      <p id="mensajeRecuperacion" class="mensaje"></p>
+    </div>
+
+    <div id="solicitudRecepcionista" class="seccion-oculta">
+      <h3>Solicitar cambio de contraseña (Recepcionistas)</h3>
+      <input type="text" id="usuarioSolicitud" placeholder="Nombre de usuario" />
+      <textarea id="detalleSolicitud" placeholder="Escribe el motivo de tu solicitud..." rows="3"></textarea>
+      <button onclick="enviarSolicitud()">Enviar solicitud</button>
+      <p id="mensajeSolicitud" class="mensaje"></p>
+
+      <div style="margin-top: 10px;">
+        <button onclick="accederAHistorial()">Ver mis solicitudes</button>
+      </div>
+    </div>
+
+    <p id="mensaje" class="mensaje"></p>
+  </div>
+
+  <script src="../js/login.js"></script>
+</body>
+</html>

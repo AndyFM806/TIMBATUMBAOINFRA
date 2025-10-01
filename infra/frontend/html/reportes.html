@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Reportes - Academia de Baile</title>
+  <link rel="stylesheet" href="../css/reportes.css">
+</head>
+<style>
+  .btn-retroceder {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    padding: 8px 18px;
+    font-size: 16px;
+    background: #f3f3f3;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-retroceder:hover {
+    background: #e0e0e0;
+  }
+  body {
+    position: relative;
+  }
+</style>
+<a href="admin_panel.html" class="btn-retroceder">⬅ Volver</a>
+<body>
+  <section class="reportes">
+    <h1>📊 Reportes</h1>
+
+<h2>📋 Reporte de Inscripciones</h2>
+<div>
+  Desde: <input type="date" id="fechaDesde">
+  Hasta: <input type="date" id="fechaHasta">
+  <button onclick="if(validarFechas()) consultarInscripciones()">🔍 Consultar</button>
+  <button onclick="if(validarFechas()) descargarReporteInscripcionesPDF()">📄 Descargar PDF</button>
+</div>
+<table id="tablaInscripciones">
+  <thead>
+    <tr>
+      <th>Alumno</th><th>DNI</th><th>Clase</th><th>Nivel</th><th>Estado</th><th>Fecha</th><th>Monto</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+  <tfoot>
+    <tr><td colspan="6"><strong>Total General</strong></td><td id="totalInscripciones">S/ 0.00</td></tr>
+  </tfoot>
+</table>
+
+<hr>
+
+<h2>👥 Alumnos por ClaseNivel</h2>
+<div>
+  <select id="claseNivelSelect"></select>
+  <button onclick="cargarAlumnosPorClase()">📋 Ver Alumnos</button>
+  <button onclick="descargarAlumnosPDF()">📄 Descargar Lista PDF</button>
+</div>
+<table id="tablaAlumnos">
+  <thead>
+    <tr><th>#</th><th>Alumno</th><th>DNI</th></tr>
+  </thead>
+  <tbody></tbody>
+</table>
+<script>
+  const hoy = new Date().toISOString().split("T")[0];
+  document.getElementById("fechaDesde").max = hoy;
+  document.getElementById("fechaHasta").max = hoy;
+
+  // Validar que fechaDesde <= fechaHasta
+  function validarFechas() {
+    const desde = document.getElementById("fechaDesde").value;
+    const hasta = document.getElementById("fechaHasta").value;
+    if (desde && hasta && desde > hasta) {
+      alert("La fecha 'Desde' debe ser menor o igual a la fecha 'Hasta'.");
+      return false;
+    }
+    return true;
+  }
+
+  // Interceptar los botones de consulta y descarga
+  document.querySelector('button[onclick="consultarInscripciones()"]').onclick = function() {
+    if (validarFechas()) consultarInscripciones();
+  };
+  document.querySelector('button[onclick="descargarReporteInscripcionesPDF()"]').onclick = function() {
+    if (validarFechas()) descargarReporteInscripcionesPDF();
+  };
+</script>
+
+  <script src="../js/reportes.js"></script>
+  <script src="../js/auth_guard.js"></script>
+
+</body>
+</html>

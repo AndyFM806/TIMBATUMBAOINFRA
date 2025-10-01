@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Panel Principal - Timba Tumbao</title>
+  <link rel="stylesheet" href="../css/panel.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container header-flex">
+      <img src="../img/lg.png" alt="Logo Timba Tumbao" class="logo-img" />
+    </div>
+  </header>
+
+  <!-- Usuario activo -->
+  <section id="usuario-section">
+    <div id="usuarioActivo" class="usuario-logeado"></div>
+  </section>
+  <section id="logout-section" style="display: flex; justify-content: flex-end; margin: 1rem 2rem 0 0;">
+    <button id="logoutBtn" class="logout-btn">Cerrar sesión</button>
+  </section>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const logoutBtn = document.getElementById('logoutBtn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+          // Aquí puedes limpiar el almacenamiento local/session y redirigir al login
+          localStorage.clear();
+          sessionStorage.clear();
+          window.location.href = '../html/login.html';
+        });
+      }
+    });
+  </script>
+  <!-- Título -->
+  <section id="titulo-section">
+    <h2 class="titulo-panel">PANEL PRINCIPAL</h2>
+  </section>
+
+  <!-- Panel de botones centrado -->
+  <section id="panel-section" style="display: flex; justify-content: center; align-items: center; min-height: 40vh;">
+    <div id="botonesPanel" class="grid-panel"></div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2025 Academia de Baile. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+  
+  <script src="../js/admin_panel.js"></script>
+  <script src="../js/auth_guard.js"></script>
+</body>
+</html>

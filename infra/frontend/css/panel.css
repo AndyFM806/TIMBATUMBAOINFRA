@@ -1,0 +1,118 @@
+/* === PANEL DE ADMINISTRADOR ESTILO PROFESIONAL === */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to bottom, #eaf9fc 0%, #ffffff 50%);
+  color: #1E2A38;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  padding: 20px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logo-img {
+  height: 55px;
+}
+
+.usuario-logeado {
+  font-size: 14px;
+  color: #666;
+  text-align: right;
+  padding: 10px 30px 0;
+}
+
+/* TÍTULO */
+.titulo-panel {
+  text-align: center;
+  font-size: 32px;
+  color: #00A8CC;
+  font-weight: bold;
+  margin: 40px auto 30px;
+}
+
+/* CONTENEDOR DE BOTONES */
+/* CONTENEDOR DE BOTONES */
+.panel-botones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 40px;
+  width: 90%;
+  max-width: 1100px;
+  margin: 0 auto 80px;
+  padding: 10px 0;
+}
+
+/* BOTONES COMO TARJETAS INTERACTIVAS */
+.panel-btn {
+  background: white;
+  border: none;
+  border-radius: 16px;
+  padding: 25px 20px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #00A8CC;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  height: 140px;
+  position: relative;
+}
+
+.panel-btn:hover {
+  background-color: #00A8CC;
+  color: white;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.15);
+}
+
+/* OPCIONAL: ÍCONO EN CADA BOTÓN (si usas FontAwesome u otro set) */
+.panel-btn i {
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+.usuario-logeado {
+  font-size: 14px;
+  color: #666;
+  text-align: right;
+  padding: 10px 30px 0;
+}
+
+/* FOOTER */
+.footer {
+  background-color: #F3F3F3;
+  color: #333;
+  padding: 30px 0;
+  text-align: center;
+  font-size: 14px;
+  margin-top: auto;
+}
+
+.footer .container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}

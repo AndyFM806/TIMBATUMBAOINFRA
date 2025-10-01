@@ -1,0 +1,43 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f1f1f1;
+  padding: 20px;
+}
+
+h2, h3 {
+  text-align: center;
+  color: #333;
+}
+
+form, table {
+  margin: 0 auto;
+  max-width: 600px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+form select, form textarea, form input, form button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+#mensaje {
+  text-align: center;
+  color: green;
+  font-weight: bold;
+  margin-top: 20px;
+}

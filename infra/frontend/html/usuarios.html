@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestión de Usuarios</title>
+  <link rel="stylesheet" href="../css/usuarios.css">
+</head>
+<style>
+  .btn-retroceder {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    padding: 8px 18px;
+    font-size: 16px;
+    background: #f3f3f3;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-retroceder:hover {
+    background: #e0e0e0;
+  }
+  body {
+    position: relative;
+  }
+</style>
+<a href="admin_panel.html" class="btn-retroceder">⬅ Volver</a>
+<body>
+  <h1>Gestión de Usuarios</h1>
+
+  <section>
+    <h2>Lista de Usuarios</h2>
+    <table>
+      <thead>
+       <tr>
+      <th>Nombre Usuario</th>
+      <th>Rol</th>
+      <th>Módulos</th>
+      <th>Acciones</th>
+    </tr>
+
+      </thead>
+      <tbody id="tablaUsuarios"></tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Registrar / Editar Usuario</h2>
+    <form id="formUsuario">
+      <input type="hidden" id="usuarioId">
+      <label>Nombre de usuario:</label>
+      <input type="text" id="nombreUsuario" required><br>
+      <label>Contraseña:</label>
+      <input type="password" id="contrasena"><br>
+      <label>Correo de recuperación (solo admin):</label>
+      <input type="email" id="correoRecuperacion"><br>
+      <label>Rol:</label>
+      <select id="rol">
+        <option value="ADMIN">Admin</option>
+        <option value="RECEPCIONISTA">Recepcionista</option>
+      </select><br>
+      <label>Módulos permitidos:</label><br>
+      <div id="modulosCheckboxes"></div>
+      <button type="submit">Guardar Usuario</button>
+    </form>
+  </section>
+
+  <section>
+    <button onclick="mostrarSolicitudes()">📨 Ver Solicitudes</button>
+  </section>
+
+  <section id="seccionSolicitudes" style="display: none;">
+    <h2>Solicitudes de Cambio</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Tipo</th>
+          <th>Detalle</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaSolicitudes"></tbody>
+    </table>
+  </section>
+
+  <script src="../js/usuarios.js"></script>
+<script src="../js/auth_guard.js"></script>
+</script>
+</body>
+</html>
