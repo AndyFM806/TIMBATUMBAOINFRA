@@ -1,0 +1,65 @@
+# =======================================
+# IGNORAR ARCHIVOS DE COMPILACIÓN Y OUTPUT
+# =======================================
+/target/
+build/
+dist/
+out/
+
+# =======================================
+# IGNORAR CARPETAS DE BACKEND (Java Spring Boot)
+# =======================================
+!.mvn/wrapper/maven-wrapper.jar
+**/target/
+!src/main/**/target/
+!src/test/**/target/
+
+# =======================================
+# IGNORAR UPLOADS (carpeta para Cloudinary / archivos temporales)
+/uploads/
+!/uploads/.gitkeep
+
+# =======================================
+# IGNORAR ARCHIVOS DE IDE Y ENTORNOS
+# STS (Spring Tool Suite)
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+
+# =======================================
+# IGNORAR ARCHIVOS DE SISTEMA
+# =======================================
+.DS_Store
+Thumbs.db
+
+# =======================================
+# IGNORAR ARCHIVOS DE FRONTEND (Netlify/Render)
+/academia-baile-front/node_modules/
+academia-baile-front/.next/
+academia-baile-front/.cache/
+academia-baile-front/.DS_Store
+
+# Si usas algún gestor de paquetes en el front:
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
