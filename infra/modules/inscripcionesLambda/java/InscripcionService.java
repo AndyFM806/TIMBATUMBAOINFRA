@@ -1,4 +1,4 @@
-package infra.inscripcionesLambda.java;
+package infra.modules.inscripcionesLambda.java;
 
 public class InscripcionService {
 
