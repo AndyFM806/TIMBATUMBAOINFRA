@@ -55,37 +55,22 @@ resource "aws_iam_role_policy_attachment" "extra_attach" {
   policy_arn = aws_iam_policy.lambda_extra_policy.arn
 }
 
-###############################
-# 4) data "archive_file"
-#    - Empaqueta tu JAR en un ZIP para subirlo a Lambda
-###############################
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_file = "${path.module}/target/inscripciones.jar"  # <- compila tu JAR con Maven/Gradle
+  source_file = "${path.module}/../java/target/inscripciones.jar"
   output_path = "${path.module}/lambda_function_payload.zip"
 }
 
-###############################
-# 5) aws_lambda_function
-###############################
 resource "aws_lambda_function" "inscripciones" {
-  function_name = var.lambda_function_name
-  runtime       = "java17"
-  handler       = var.lambda_handler             # p.ej. com.academia.HelloLambda::handleRequest
-  role          = aws_iam_role.lambda_exec.arn
+  function_name    = "inscripciones"
+  runtime          = "java17"
+  handler          = "com.academia.HelloLambda::handleRequest"
+  role             = aws_iam_role.lambda_exec.arn
 
   filename         = data.archive_file.lambda_zip.output_path
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 
-  # (Opcional) Variables de entorno
-  environment {
-    variables = {
-      DDB_TABLE = var.ddb_table_name
-      STAGE     = var.stage
-    }
-  }
-
-  timeout = 15
+  timeout     = 15
   memory_size = 512
 }
 
