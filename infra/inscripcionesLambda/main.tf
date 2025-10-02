@@ -1,5 +1,5 @@
 ###############################
-# 1) aws_iam_role
+# IAM ROLE para la Lambda
 ###############################
 resource "aws_iam_role" "lambda_exec" {
   name = "lambda-inscripciones-exec-role"
@@ -15,35 +15,28 @@ resource "aws_iam_role" "lambda_exec" {
 }
 
 ###############################
-# 2) aws_iam_policy (permisos extra opcionales)
-#    - Ejemplo: PutItem/GetItem en DynamoDB (tabla inscripciones)
+# (Opcional) Política extra: DynamoDB
 ###############################
+data "aws_caller_identity" "current" {}
+
 resource "aws_iam_policy" "lambda_extra_policy" {
   name        = "lambda-inscripciones-extra-policy"
-  description = "Permisos extra para la Lambda de inscripciones (ej. DynamoDB)"
+  description = "Permisos extra (DynamoDB) para Lambda inscripciones"
 
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
-      # (Opcional) Permisos a DynamoDB
       {
-        Effect = "Allow",
-        Action = [
-          "dynamodb:PutItem",
-          "dynamodb:GetItem",
-          "dynamodb:UpdateItem"
-        ],
+        Effect   = "Allow",
+        Action   = ["dynamodb:PutItem","dynamodb:GetItem","dynamodb:UpdateItem"],
         Resource = "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${var.ddb_table_name}"
       }
     ]
   })
 }
 
-data "aws_caller_identity" "current" {}
-
 ###############################
-# 3) aws_iam_role_policy_attachment
-#    - Logs básicos a CloudWatch + política extra
+# Adjuntar políticas al rol
 ###############################
 resource "aws_iam_role_policy_attachment" "basic_logs" {
   role       = aws_iam_role.lambda_exec.name
@@ -55,31 +48,35 @@ resource "aws_iam_role_policy_attachment" "extra_attach" {
   policy_arn = aws_iam_policy.lambda_extra_policy.arn
 }
 
-data "archive_file" "lambda_zip" {
-  type        = "zip"
-  source_file = "${path.module}/../java/target/inscripciones.jar"
-  output_path = "${path.module}/lambda_function_payload.zip"
-}
-
+###############################
+# Lambda (subiendo el JAR directamente)
+###############################
 resource "aws_lambda_function" "inscripciones" {
-  function_name    = "inscripciones"
-  runtime          = "java17"
-  handler          = "com.academia.HelloLambda::handleRequest"
-  role             = aws_iam_role.lambda_exec.arn
+  function_name = var.lambda_function_name
+  runtime       = "java17"
+  handler       = var.lambda_handler                # ej: com.academia.HelloLambda::handleRequest
+  role          = aws_iam_role.lambda_exec.arn
 
+  # Ruta al JAR ya compilado
   filename         = "${path.module}/java/target/inscripciones.jar"
   source_code_hash = filebase64sha256("${path.module}/java/target/inscripciones.jar")
 
   timeout     = 15
   memory_size = 512
+
+  environment {
+    variables = {
+      DDB_TABLE = var.ddb_table_name
+      STAGE     = var.stage
+    }
+  }
 }
 
-
 ###############################
-# Variables útiles
+# Variables
 ###############################
 variable "aws_region" {
-  description = "Región AWS donde despliegas"
+  description = "Región AWS"
   type        = string
   default     = "us-east-1"
 }
@@ -93,6 +90,7 @@ variable "lambda_function_name" {
 variable "lambda_handler" {
   description = "Handler Java de la Lambda"
   type        = string
+  # Cambia si tu clase real es otra, p.ej: com.academia.InscripcionService::handleRequest
   default     = "com.academia.HelloLambda::handleRequest"
 }
 
