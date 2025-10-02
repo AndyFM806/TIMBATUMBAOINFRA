@@ -1,16 +1,6 @@
-
-# Terraform files
+# --- Terraform (IaC) ---
 *.tfstate
-*.tfstate.backup
+*.tfstate.*
 .terraform/
-*.tfvars
-
-# Build artifacts
-*.zip
-src_dist/
-
-# Node.js dependencies
-node_modules/
-
-# OS files
-.DS_Store
+.terraform.lock.hcl
+.terraform.tfstate.backup
