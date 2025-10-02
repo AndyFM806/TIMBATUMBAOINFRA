@@ -67,12 +67,13 @@ resource "aws_lambda_function" "inscripciones" {
   handler          = "com.academia.HelloLambda::handleRequest"
   role             = aws_iam_role.lambda_exec.arn
 
-  filename         = data.archive_file.lambda_zip.output_path
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  filename         = "${path.module}/java/target/inscripciones.jar"
+  source_code_hash = filebase64sha256("${path.module}/java/target/inscripciones.jar")
 
   timeout     = 15
   memory_size = 512
 }
+
 
 ###############################
 # Variables útiles
