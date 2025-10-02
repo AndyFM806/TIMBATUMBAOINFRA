@@ -1,13 +1,13 @@
-#  📖 Proyecto: Sistema de Inscripciones y Gestión Académica 🎓
+# Proyecto: Sistema de Inscripciones y Gestión Académica 🎓
 
-## 📌 Descripción General  
+## Descripción General  
 Este sistema está diseñado para **gestionar inscripciones, usuarios, horarios y clases** dentro de una academia. Su objetivo es digitalizar los procesos de matrícula y control académico, asegurando eficiencia, escalabilidad y seguridad.  
 
 Los actores principales son:  
 - **Usuarios (alumnos/clientes)** → se registran, visualizan cursos y realizan inscripciones.  
 - **Administradores** → gestionan inscripciones, validan pagos, administran clases y alumnos. 
 
-## 📌 Contexto y Problemática  
+## Contexto y Problemática  
 
 La aplicación tradicional presentaba desafíos que limitaban su rendimiento y confiabilidad:  
 
@@ -16,23 +16,23 @@ La aplicación tradicional presentaba desafíos que limitaban su rendimiento y c
 3. **Notificaciones poco confiables:** Dificultades para manejar correos, SMS y colas de mensajes en alta demanda.  
 4. **Picos de concurrencia:** Procesos críticos fallaban en temporadas de alta carga.  
 
-## 🚀 Solución Propuesta: Arquitectura en AWS  
+## Solución Propuesta: Arquitectura en AWS  
 
 Se implementó una arquitectura **serverless y modular** sobre AWS para cubrir los problemas identificados.  
 
 ### Beneficios Clave  
-✅ **Escalabilidad:** Uso de **AWS Lambda + API Gateway** para manejar picos de tráfico.  
-✅ **Seguridad:** Integración con **Cognito, WAF e IAM Roles** con privilegios mínimos.  
-✅ **Disponibilidad:** **S3 + CloudFront** para servir el frontend con baja latencia global.  
-✅ **Observabilidad:** **CloudWatch** centralizando logs y métricas en tiempo real.  
-✅ **Automatización:** Manejo de colas y notificaciones con **SQS y SNS**.  
+**Escalabilidad:** Uso de **AWS Lambda + API Gateway** para manejar picos de tráfico.  
+**Seguridad:** Integración con **Cognito, WAF e IAM Roles** con privilegios mínimos.  
+**Disponibilidad:** **S3 + CloudFront** para servir el frontend con baja latencia global.  
+**Observabilidad:** **CloudWatch** centralizando logs y métricas en tiempo real.  
+**Automatización:** Manejo de colas y notificaciones con **SQS y SNS**.  
 
 
-## 🏗️ Arquitectura  
+## Arquitectura  
 
 La solución implementa una arquitectura **basada en microservicios y servicios gestionados de AWS**, que se conectan de la siguiente manera:
 
-### 🌐 Frontend  
+### Frontend  
 - **Amazon S3**:  
   Almacena todos los archivos estáticos del frontend (HTML, CSS, JS, imágenes).  
   El bucket es privado y solo accesible mediante **CloudFront**.  
@@ -46,7 +46,7 @@ La solución implementa una arquitectura **basada en microservicios y servicios 
 
 ---
 
-### 🔐 Autenticación y Roles  
+### Autenticación y Roles  
 - **Amazon Cognito**:  
   Administra usuarios y autenticación segura mediante pools.  
 - **AWS IAM**:  
@@ -56,7 +56,7 @@ La solución implementa una arquitectura **basada en microservicios y servicios 
 
 ---
 
-### ⚙️ Backend – Lambdas  
+### Backend – Lambdas  
 Microservicios serverless conectados por eventos:  
 
 - **UploadVoucher Lambda**: Procesa comprobantes de pago.  
@@ -67,7 +67,7 @@ Microservicios serverless conectados por eventos:
 
 ---
 
-### 📩 Mensajería Asíncrona  
+### Mensajería Asíncrona  
 - **Amazon SQS**:  
   Sistema de colas que desacopla procesos y mejora resiliencia bajo alta concurrencia.  
 - **Amazon SNS**:  
@@ -75,7 +75,7 @@ Microservicios serverless conectados por eventos:
 
 ---
 
-### 💾 Persistencia de Datos  
+### Persistencia de Datos  
 - **Amazon RDS (MySQL)**:  
   Base de datos relacional para usuarios, inscripciones y pagos.  
 - **Amazon RDS Proxy**:  
@@ -83,7 +83,7 @@ Microservicios serverless conectados por eventos:
 
 ---
 
-### 📊 Monitoreo y Notificaciones  
+### Monitoreo y Notificaciones  
 - **Amazon CloudWatch**:  
   Monitorea métricas y logs de todo el sistema (Lambdas, API Gateway, RDS).  
 - **Amazon SES**:  
@@ -91,7 +91,7 @@ Microservicios serverless conectados por eventos:
 
 ---
 
-## 🔒 Seguridad y Buenas Prácticas  
+## Seguridad y Buenas Prácticas  
 - Principio de mínimo privilegio con **IAM Roles**.  
 - **S3 privado + CloudFront** para proteger los archivos del frontend.  
 - **WAF** contra ataques en capa de aplicación.  
