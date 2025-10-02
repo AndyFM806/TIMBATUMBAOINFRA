@@ -1,6 +1,6 @@
-############################################
+
 # SQS: Cola principal + DLQ (dead-letter)
-############################################
+
 
 # Cola de errores (DLQ)
 resource "aws_sqs_queue" "inscripciones_dlq" {
@@ -18,7 +18,7 @@ resource "aws_sqs_queue" "inscripciones_queue" {
   # Mantén mensajes hasta 4 días si nadie los consume
   message_retention_seconds          = 345600
 
-  # Debe ser >= 6x el timeout de la Lambda (regla recomendada)
+  # Debe ser >= 6x el timeout de la Lambda
   # Tu Lambda tiene timeout 15s -> 6 * 15 = 90
   visibility_timeout_seconds         = 90
 
@@ -33,9 +33,9 @@ resource "aws_sqs_queue" "inscripciones_queue" {
   }
 }
 
-############################################
+
 # Permisos IAM para que la Lambda lea SQS
-############################################
+
 
 # Adjunta la política administrada: incluye SQS + CloudWatch Logs
 resource "aws_iam_role_policy_attachment" "lambda_sqs_exec" {
@@ -43,9 +43,8 @@ resource "aws_iam_role_policy_attachment" "lambda_sqs_exec" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
 
-############################################
 # Conectar SQS -> Lambda (Event Source Mapping)
-############################################
+
 resource "aws_lambda_event_source_mapping" "sqs_to_lambda" {
   event_source_arn                         = aws_sqs_queue.inscripciones_queue.arn
   function_name                            = aws_lambda_function.inscripciones.arn
@@ -58,9 +57,9 @@ resource "aws_lambda_event_source_mapping" "sqs_to_lambda" {
   # Reintentos controlados por SQS (maxReceiveCount en redrive_policy).
 }
 
-############################################
+
 # Variables y outputs
-############################################
+
 variable "sqs_queue_name" {
   description = "Nombre de la cola SQS principal"
   type        = string
@@ -78,3 +77,9 @@ output "sqs_queue_arn" {
 output "sqs_dlq_url" {
   value = aws_sqs_queue.inscripciones_dlq.url
 }
+#Producto (web/servicio) envía un mensaje JSON con la inscripción a inscripciones-queue (SQS).
+#SQS guarda el mensaje de forma duradera.
+#Event Source Mapping (SQS → Lambda) detecta mensajes y dispara la Lambda en lotes de 5 (tu batch_size).
+#La Lambda procesa cada inscripción (ej. valida datos, escribe en DynamoDB, etc.).
+#Si la Lambda confirma el lote, SQS elimina esos mensajes.
+#Si la Lambda falla, SQS reintenta. Tras 5 intentos (tu maxReceiveCount), el mensaje se mueve a la DLQ inscripciones-queue-dlq para análisis posterior.

@@ -1,6 +1,6 @@
-###############################
+
 # IAM ROLE para la Lambda
-###############################
+
 resource "aws_iam_role" "lambda_exec" {
   name = "lambda-inscripciones-exec-role"
 
@@ -14,9 +14,9 @@ resource "aws_iam_role" "lambda_exec" {
   })
 }
 
-###############################
+
 # (Opcional) Política extra: DynamoDB
-###############################
+
 data "aws_caller_identity" "current" {}
 
 resource "aws_iam_policy" "lambda_extra_policy" {
@@ -35,9 +35,9 @@ resource "aws_iam_policy" "lambda_extra_policy" {
   })
 }
 
-###############################
+
 # Adjuntar políticas al rol
-###############################
+
 resource "aws_iam_role_policy_attachment" "basic_logs" {
   role       = aws_iam_role.lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -48,9 +48,9 @@ resource "aws_iam_role_policy_attachment" "extra_attach" {
   policy_arn = aws_iam_policy.lambda_extra_policy.arn
 }
 
-###############################
+
 # Lambda (subiendo el JAR directamente)
-###############################
+
 resource "aws_lambda_function" "inscripciones" {
   function_name = var.lambda_function_name
   runtime       = "java17"
@@ -72,9 +72,9 @@ resource "aws_lambda_function" "inscripciones" {
   }
 }
 
-###############################
+
 # Variables
-###############################
+
 variable "aws_region" {
   description = "Región AWS"
   type        = string
@@ -106,9 +106,9 @@ variable "stage" {
   default     = "Dev"
 }
 
-###############################
+
 # Outputs
-###############################
+
 output "lambda_name" {
   value = aws_lambda_function.inscripciones.function_name
 }
