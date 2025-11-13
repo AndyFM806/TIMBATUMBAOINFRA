@@ -1,8 +1,6 @@
-#############################################
-# outputs.tf — Salidas globales (ROOT)
-#############################################
 
-# 🧠 Cognito
+
+# Cognito
 output "cognito_user_pool_id" {
   description = "ID del User Pool de Cognito."
   value       = aws_cognito_user_pool.ttapp_userpool.id
@@ -29,7 +27,7 @@ output "secretary_role_arn" {
   value       = aws_iam_role.secretary_role_ttapp.arn
 }
 
-# 🪣 S3
+#  S3
 output "s3_bucket_name" {
   description = "Nombre del bucket S3 que aloja el sitio web estático."
   value       = aws_s3_bucket.website_bucket.bucket
@@ -40,7 +38,7 @@ output "s3_bucket_arn" {
   value       = aws_s3_bucket.website_bucket.arn
 }
 
-# 🌐 CloudFront
+# CloudFront
 output "cloudfront_distribution_id" {
   description = "ID de la distribución CloudFront asociada al frontend."
   value       = aws_cloudfront_distribution.website_distribution.id
@@ -51,7 +49,7 @@ output "cloudfront_domain_name" {
   value       = aws_cloudfront_distribution.website_distribution.domain_name
 }
 
-# 🔒 WAF
+#  WAF
 output "waf_name" {
   description = "Nombre de la Web ACL del WAF asociada al API Gateway."
   value       = aws_wafv2_web_acl.api_waf.name
@@ -62,7 +60,7 @@ output "waf_arn" {
   value       = aws_wafv2_web_acl.api_waf.arn
 }
 
-# 🔗 API Gateway
+#  API Gateway
 output "api_id" {
   description = "ID del API Gateway HTTP."
   value       = module.api.api_id
@@ -78,13 +76,13 @@ output "api_route_inscripciones" {
   value       = module.api.api_route_inscripciones
 }
 
-# ⚙️ Lambda
+# Lambda
 output "lambda_function_arn" {
   description = "ARN de la función Lambda (inscripciones)."
   value       = var.lambda_arn
 }
 
-# 🏷️ Generales
+#  Generales
 output "aws_region" {
   description = "Región de despliegue en AWS."
   value       = var.aws_region

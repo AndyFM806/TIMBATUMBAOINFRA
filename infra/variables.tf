@@ -1,15 +1,11 @@
-#############################################
-# variables.tf — Variables globales (ROOT)
-#############################################
 
-# 🌎 AWS Provider
 variable "aws_region" {
   description = "Región de AWS donde se desplegarán los recursos."
   type        = string
   default     = "us-east-1"
 }
 
-# 🏷️ Etapa / entorno
+
 variable "stage" {
   description = "Entorno lógico para tags y configuración (Dev/QA/Prod)."
   type        = string
@@ -19,14 +15,14 @@ variable "stage" {
   }
 }
 
-# 🌐 CORS — API Gateway
+
 variable "allowed_origins" {
   description = "Orígenes permitidos para CORS del API Gateway HTTP."
   type        = list(string)
   default     = ["*"] # Reemplazar por dominios reales cuando se tengan.
 }
 
-# 🧠 Cognito / Autenticación
+
 variable "enable_cognito_auth" {
   description = "Habilitar el authorizer JWT (Cognito) en las rutas del API."
   type        = bool
@@ -45,7 +41,6 @@ variable "jwt_audiences" {
   default     = []
 }
 
-# 🧩 Lambda
 variable "lambda_function_name" {
   description = "Nombre de la función AWS Lambda."
   type        = string
@@ -69,13 +64,11 @@ variable "jar_path" {
   type        = string
 }
 
-# 🪣 DynamoDB
 variable "ddb_table_name" {
   description = "Nombre de la tabla DynamoDB usada por la Lambda."
   type        = string
 }
 
-# 📬 SQS
 variable "sqs_queue_name" {
   description = "Nombre de la cola SQS principal (sin espacios)."
   type        = string
