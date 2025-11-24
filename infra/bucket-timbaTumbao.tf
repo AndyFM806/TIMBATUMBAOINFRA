@@ -1,57 +1,52 @@
-
-# Creacion del S3 bucket
 resource "aws_s3_bucket" "website_bucket" {
-  bucket = "wdc-my-website-bucket"  
-## Nombre del bucket. Si se omite, Terraform asignará un nombre aleatorio y único.
+  bucket = "wdc-my-website-bucket"
 
   tags = {
     Name        = "My Website Bucket"
     Environment = "Dev"
   }
 }
-# Configuracion S3 bucket ownership controls
-# aws_s3_bucket_ownership_controls Para buscar la documentación oficial de este recurso
-# visita: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_ownership_controls
 
-resource "aws_s3_bucket_ownership_controls" "website_bucket" {
+resource "aws_s3_bucket_versioning" "website_bucket" {
   bucket = aws_s3_bucket.website_bucket.id
-
-  rule {
-    object_ownership = "BucketOwnerPreferred"
-    #Ejemplo: Yo como propietario del bucket y otro usuario carga objetos dentro de él, con la regla BucketOwnerPreferred esos objetos pasan automáticamente a ser de mi propiedad como dueño del bucket
+  versioning_configuration {
+    status = "Enabled"
   }
 }
 
-# Configuracion S3 bucket public access block
-resource "aws_s3_bucket_public_access_block" "website_bucket" {
+resource "aws_s3_bucket_server_side_encryption_configuration" "website_bucket" {
   bucket = aws_s3_bucket.website_bucket.id
-
-  block_public_acls       = false
-  # Evita que se apliquen ACLs públicas (Access Control Lists) a objetos o al bucket.
-  block_public_policy     = false
-  # Bloquea políticas de bucket que permitan acceso público.
-  ignore_public_acls      = false
-  # Ignora cualquier ACL pública existente en objetos.
-  restrict_public_buckets = false
-  # Restringe el acceso a buckets con políticas públicas.
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
 }
-# aws_s3_bucket_public_access_block Para buscar la documentación oficial de este recurso
-# visita: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block
 
+resource "aws_s3_bucket_ownership_controls" "website_bucket" {
+  bucket = aws_s3_bucket.website_bucket.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
 
-# aws_s3_bucket_public_access_block Para buscar la documentación oficial de este recurso
-# visita: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_acl
+resource "aws_s3_bucket_public_access_block" "website_bucket" {
+  bucket                  = aws_s3_bucket.website_bucket.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
 
-# Subida de archivos estáticos del frontend al bucket S3
-resource "aws_s3_object" "website_bucket" {
+resource "aws_s3_object" "website_objects" {
   for_each = fileset("${path.module}/../frontend", "**/*")
 
-  bucket = aws_s3_bucket.website_bucket.bucket
+  bucket = aws_s3_bucket.website_bucket.id
   key    = each.value
   source = "${path.module}/../frontend/${each.value}"
   etag   = filemd5("${path.module}/../frontend/${each.value}")
+  acl    = "private"
 
-  # Detecta y asigna automáticamente el content-type según la extensión
   content_type = lookup(
     {
       html = "text/html"
@@ -62,8 +57,7 @@ resource "aws_s3_object" "website_bucket" {
       jpeg = "image/jpeg"
       svg  = "image/svg+xml"
     },
-    regex("\\.(\\w+)$", each.value)[0],
+    try(regex("\\.(\\w+)$", each.value)[0], "bin"),
     "application/octet-stream"
   )
 }
-
