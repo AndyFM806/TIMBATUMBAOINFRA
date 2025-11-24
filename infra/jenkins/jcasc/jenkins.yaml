@@ -1,0 +1,62 @@
+jenkins:
+  systemMessage: "Jenkins configurado con acceso directo admin/admin"
+
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "admin"
+
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+  disableRememberMe: false
+
+clouds:
+  - docker:
+      name: "dind-cloud"
+      dockerApi:
+        dockerHost:
+          uri: "tcp://docker-dind:2375"
+      templates:
+        - name: "docker-agent"
+          labelString: "docker"
+          dockerTemplateBase:
+            image: "docker-agent"
+          connector:
+            attach:
+              user: "root"
+
+        - name: "terraform-agent"
+          labelString: "terraform"
+          dockerTemplateBase:
+            image: "terraform-agent"
+          connector:
+            attach:
+              user: "root"
+
+
+jobs:
+  - script: >
+      pipelineJob('infra-dind-job') {
+        definition {
+          cps {
+            script("""
+              node('docker') {
+                stage('Docker test') {
+                  sh 'docker version'
+                }
+              }
+
+              node('terraform') {
+                stage('Terraform test') {
+                  sh 'terraform version'
+                }
+              }
+            """)
+            sandbox()
+          }
+        }
+      }
