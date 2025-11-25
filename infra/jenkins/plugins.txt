@@ -8,3 +8,4 @@ ssh-agent
 
 docker-workflow
 docker-plugin
+job-dsl
