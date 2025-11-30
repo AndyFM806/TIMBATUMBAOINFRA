@@ -1,26 +1,17 @@
-# MÓDULO: LAMBDA (Java 17)
-# - Crea la función Lambda
-# - EXPONE outputs (arn y nombre)
-# - NO incluye permisos de API Gateway (eso va en el módulo del API)
 
-
-
-# Variables del módulo
+# Variables locales (paths internos del módulo)
 locals {
+  # La ruta del JAR debe ser la ruta ABSOLUTA/RELATIVA al módulo.
+  # El path.module garantiza que siempre apunte a la carpeta actual del módulo.
   jar_path_abs = "${path.module}/java/target/inscripciones.jar"
 }
-variable "aws_region"           { type = string }
-variable "lambda_function_name" { type = string }   # ej: "inscripciones"
-variable "lambda_handler"       { type = string }   # ej: "com.academia.HelloLambda::handleRequest"
-variable "ddb_table_name"       { type = string }   # si no usas DDB, puedes pasar "" y quitar política
-variable "stage"                { type = string }   # Dev/QA/Prod
-variable "jar_path"             { type = string }   # ruta absoluta/relativa al JAR
 
-
+# -----------------------------------------------------------------------------
 # IAM Role para Lambda
+# -----------------------------------------------------------------------------
 
 resource "aws_iam_role" "lambda_exec" {
-  name = "lambda-${var.lambda_function_name}-exec-role"
+  name = "lambda-${var.lambda_function_name}-exec-role-${var.stage}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -32,7 +23,7 @@ resource "aws_iam_role" "lambda_exec" {
   })
 }
 
-# Logs básicos (déjalo igual)
+# Logs básicos
 resource "aws_iam_role_policy_attachment" "basic_logs" {
   role       = aws_iam_role.lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -44,8 +35,9 @@ resource "aws_iam_role_policy_attachment" "dynamodb_managed" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
 }
 
-
+# -----------------------------------------------------------------------------
 # Lambda (Java 17)
+# -----------------------------------------------------------------------------
 
 resource "aws_lambda_function" "inscripciones" {
   function_name = var.lambda_function_name
@@ -54,6 +46,7 @@ resource "aws_lambda_function" "inscripciones" {
   runtime       = "java17"
 
   # Empaquetado: JAR ya compilado
+  # Usamos la ruta local al JAR compilado dentro de la estructura de tu proyecto.
   filename         = local.jar_path_abs
   source_code_hash = filebase64sha256(local.jar_path_abs)
 
@@ -67,5 +60,8 @@ resource "aws_lambda_function" "inscripciones" {
     }
   }
 
+  tags = {
+    Service     = var.lambda_function_name
+    Environment = var.stage
+  }
 }
-

@@ -9,7 +9,6 @@ module "inscripciones_lambda" {
   ddb_table_name       = var.ddb_table_name
   stage                = var.stage
   jar_path             = var.jar_path
-  sqs_queue_name       = var.sqs_queue_name
 }
 
 
