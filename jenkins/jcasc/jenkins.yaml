@@ -20,22 +20,34 @@ jenkins:
         dockerApi:
           dockerHost:
             uri: "tcp://docker-dind:2375"
+
         templates:
+
           - name: "docker-agent"
             labelString: "docker"
+            remoteFs: "/home/jenkins"
+            instanceCapStr: "5"
             dockerTemplateBase:
-              image: "jenkins/ssh-agent:jdk11"
+              image: "docker:27-dind"   
+              tty: true
+            retentionStrategy:
+              idleMinutes: 10
             connector:
               attach:
-                user: "jenkins"
+                user: "root"             
 
           - name: "terraform-agent"
             labelString: "terraform"
+            remoteFs: "/home/jenkins"
+            instanceCapStr: "5"
             dockerTemplateBase:
-              image: "jenkins/ssh-agent:jdk11"
+              image: "hashicorp/terraform:1.14
+              tty: true
+            retentionStrategy:
+              idleMinutes: 10
             connector:
               attach:
-                user: "jenkins"
+                user: "root"
 
 jobs:
   - script: >
@@ -47,19 +59,21 @@ jobs:
                 agent none
 
                 stages {
-                  stage('Docker agent') {
+                  stage('Probar agente Docker') {
                     agent { label 'docker' }
                     steps {
                       sh 'echo Hola desde el agente Docker'
                       sh 'hostname'
+                      sh 'docker --version || echo "docker CLI no instalado"'
                     }
                   }
 
-                  stage('Terraform agent') {
+                  stage('Probar agente Terraform') {
                     agent { label 'terraform' }
                     steps {
                       sh 'echo Hola desde el agente Terraform'
                       sh 'hostname'
+                      sh 'terraform version || echo "Terraform no instalado"'
                     }
                   }
                 }

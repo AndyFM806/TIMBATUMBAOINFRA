@@ -2,32 +2,42 @@ version: "3.8"
 
 services:
   jenkins:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: jenkins-master
-    privileged: true
-    ports:
-      - "8080:8080"
     environment:
       - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+      - CASC_JENKINS_CONFIG=/var/jenkins_home/casc/jenkins.yaml
+    ports:
+      - "8080:8080"
+      - "50000:50000"
     volumes:
       - jenkins_home:/var/jenkins_home
-      - ./jcasc/jenkins.yaml:/var/jenkins_home/casc/jenkins.yaml
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ./jcasc/jenkins.yaml:/var/jenkins_home/casc/jenkins.yaml:ro
+    depends_on:
+      - docker-dind
+    networks:
+      - jenkins-net
 
   docker-dind:
-    image: docker:dind
+    image: docker:27-dind
     container_name: docker-dind
     privileged: true
     environment:
       - DOCKER_TLS_CERTDIR=
-
-  docker-agent:
-    build: ./agents/docker-agent
-    container_name: docker-agent
-
-  terraform-agent:
-    build: ./agents/terraform-agent
-    container_name: terraform-agent
+    command: ["dockerd", "--host=tcp://0.0.0.0:2375", "--tls=false"]
+    ports:
+      - "2375:2375"
+    volumes:
+      - dind_storage:/var/lib/docker
+    networks:
+      - jenkins-net
 
 volumes:
   jenkins_home:
+  dind_storage:
+
+networks:
+  jenkins-net:
+    driver: bridge

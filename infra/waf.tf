@@ -1,11 +1,7 @@
-##############################################
-# AWS WAF - Protege el API Gateway HTTP
-##############################################
-
 resource "aws_wafv2_web_acl" "api_waf" {
   name        = "waf-apigateway-TTapp"
   description = "Web ACL para proteger el API Gateway de TimbaTumbaoApp"
-  scope       = "REGIONAL" # Para API Gateway regional/HTTP
+  scope       = "REGIONAL" 
 
   default_action {
     allow {}
@@ -116,12 +112,6 @@ resource "aws_wafv2_web_acl" "api_waf" {
   }
 }
 
-##############################################
-# Asociación del WAF con el API Gateway
-##############################################
-
-# OJO: aquí supongo que tienes un módulo "api" que expone el ARN del stage
-# Si aún no lo tienes, luego ajustamos esto; por ahora es sintaxis válida.
 
 resource "aws_wafv2_web_acl_association" "api_waf_association" {
   resource_arn = module.api.api_stage_arn

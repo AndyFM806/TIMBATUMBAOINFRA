@@ -1,0 +1,113 @@
+pipeline {
+    agent none
+
+    environment {
+        AWS_DEFAULT_REGION = 'us-east-1'
+        TF_IN_AUTOMATION  = 'true'
+    }
+
+    stages {
+
+        stage('Checkout') {
+            agent { label 'terraform' }
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('1. Linting y validación Terraform') {
+            agent { label 'terraform' }
+            steps {
+                dir('infra') {
+                    sh '''
+                        echo "[TF] Formateando y validando..."
+                        terraform fmt -check
+                        terraform validate
+                    '''
+                }
+            }
+        }
+
+        stage('2. Test unitarios (Node)') {
+            agent { label 'node' }  // nodo Jenkins con Node/NPM instalado
+            steps {
+                dir('frontend') {   // CAMBIA esto si tu código está en otra carpeta
+                    sh '''
+                        npm install
+                        # ejemplo: si tu script en package.json es "test": "vitest --run"
+                        npm test -- --unit
+                    '''
+                }
+            }
+        }
+
+        stage('3. Terraform Plan (preview)') {
+            agent { label 'terraform' }
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'aws-credentials-00',   // ID lógico en Jenkins
+                        usernameVariable: 'AWS_ACCESS_KEY_ID',
+                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                    )
+                ]) {
+                    dir('infra') {
+                        sh '''
+                            echo "[TF] Init..."
+                            terraform init -input=false
+
+                            echo "[TF] Plan usando terraform.tfvars..."
+                            terraform plan \
+                              -input=false \
+                              -var-file=terraform.tfvars \
+                              -out=tfplan
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('4. Aprobación manual') {
+            when {
+                branch 'main'
+            }
+            agent none
+            steps {
+                input message: '¿Aplicar cambios de Terraform en AWS con este plan?',
+                      ok: 'Aplicar IaC'
+            }
+        }
+
+        stage('5. Terraform Apply') {
+            when {
+                branch 'main'
+            }
+            agent { label 'terraform' }
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'aws-credentials-00',
+                        usernameVariable: 'AWS_ACCESS_KEY_ID',
+                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                    )
+                ]) {
+                    dir('infra') {
+                        sh '''
+                            echo "[TF] Aplicando plan tfplan..."
+                            terraform apply -input=false -auto-approve tfplan
+                        '''
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Despliegue de infraestructura (IaC) completado exitosamente.'
+        }
+        failure {
+            echo 'Error en el pipeline. Revisa la etapa fallida en Jenkins.'
+        }
+    }
+}
