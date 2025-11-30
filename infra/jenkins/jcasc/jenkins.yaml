@@ -14,29 +14,28 @@ jenkins:
 
   disableRememberMe: false
 
-clouds:
-  - docker:
-      name: "dind-cloud"
-      dockerApi:
-        dockerHost:
-          uri: "tcp://docker-dind:2375"
-      templates:
-        - name: "docker-agent"
-          labelString: "docker"
-          dockerTemplateBase:
-            image: "docker-agent"
-          connector:
-            attach:
-              user: "root"
+  clouds:
+    - docker:
+        name: "dind-cloud"
+        dockerApi:
+          dockerHost:
+            uri: "tcp://docker-dind:2375"
+        templates:
+          - name: "docker-agent"
+            labelString: "docker"
+            dockerTemplateBase:
+              image: "jenkins/ssh-agent:jdk11"
+            connector:
+              attach:
+                user: "jenkins"
 
-        - name: "terraform-agent"
-          labelString: "terraform"
-          dockerTemplateBase:
-            image: "terraform-agent"
-          connector:
-            attach:
-              user: "root"
-
+          - name: "terraform-agent"
+            labelString: "terraform"
+            dockerTemplateBase:
+              image: "jenkins/ssh-agent:jdk11"
+            connector:
+              attach:
+                user: "jenkins"
 
 jobs:
   - script: >
@@ -44,15 +43,25 @@ jobs:
         definition {
           cps {
             script("""
-              node('docker') {
-                stage('Docker test') {
-                  sh 'docker version'
-                }
-              }
+              pipeline {
+                agent none
 
-              node('terraform') {
-                stage('Terraform test') {
-                  sh 'terraform version'
+                stages {
+                  stage('Docker agent') {
+                    agent { label 'docker' }
+                    steps {
+                      sh 'echo Hola desde el agente Docker'
+                      sh 'hostname'
+                    }
+                  }
+
+                  stage('Terraform agent') {
+                    agent { label 'terraform' }
+                    steps {
+                      sh 'echo Hola desde el agente Terraform'
+                      sh 'hostname'
+                    }
+                  }
                 }
               }
             """)

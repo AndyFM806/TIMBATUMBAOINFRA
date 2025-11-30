@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   jenkins:
     build: .
@@ -8,16 +10,24 @@ services:
     environment:
       - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
     volumes:
+      - jenkins_home:/var/jenkins_home
+      - ./jcasc/jenkins.yaml:/var/jenkins_home/casc/jenkins.yaml
       - /var/run/docker.sock:/var/run/docker.sock
 
   docker-dind:
     image: docker:dind
+    container_name: docker-dind
     privileged: true
     environment:
       - DOCKER_TLS_CERTDIR=
 
   docker-agent:
     build: ./agents/docker-agent
+    container_name: docker-agent
 
   terraform-agent:
     build: ./agents/terraform-agent
+    container_name: terraform-agent
+
+volumes:
+  jenkins_home:
