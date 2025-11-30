@@ -4,3 +4,9 @@ output "api_endpoint"            { value = aws_apigatewayv2_api.http.api_endpoin
 output "api_invoke_url"          { value = "${aws_apigatewayv2_api.http.api_endpoint}/${aws_apigatewayv2_stage.prod.name}" }
 output "api_route_inscripciones" { value = "${aws_apigatewayv2_api.http.api_endpoint}/${aws_apigatewayv2_stage.prod.name}/inscripciones" }
 output "authorizer_id"           { value = try(aws_apigatewayv2_authorizer.cognito[0].id, null) }
+output "api_stage_arn" {
+  description = "ARN del stage principal (prod) del API HTTP."
+  value       = aws_apigatewayv2_stage.prod.arn
+}
+
+

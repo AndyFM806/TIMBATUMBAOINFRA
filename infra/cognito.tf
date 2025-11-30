@@ -31,10 +31,12 @@ resource "aws_cognito_user_pool_client" "ttapp_client" {
   explicit_auth_flows = [
     "ALLOW_USER_PASSWORD_AUTH",
     "ALLOW_REFRESH_TOKEN_AUTH",
-    "ALLOW_SRP_AUTH"
+    "ALLOW_USER_SRP_AUTH"
   ]
 
-  generate_secret              = false
+
+
+  generate_secret               = false
   prevent_user_existence_errors = "ENABLED"
 
   access_token_validity  = 1

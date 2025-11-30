@@ -14,8 +14,8 @@ resource "aws_iam_role" "admin_role_ttapp" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action    = "sts:AssumeRole"
-        Effect    = "Allow"
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
         Principal = {
           Service = "lambda.amazonaws.com"
         }
@@ -87,8 +87,8 @@ resource "aws_iam_role" "secretary_role_ttapp" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action    = "sts:AssumeRole"
-        Effect    = "Allow"
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
         Principal = {
           Service = "lambda.amazonaws.com"
         }
@@ -109,8 +109,8 @@ resource "aws_iam_role_policy" "secretary_policy_ttapp" {
       # LECTURA LIMITADA EN S3
       ###############################
       {
-        Effect   = "Allow"
-        Action   = ["s3:GetObject", "s3:ListBucket"]
+        Effect = "Allow"
+        Action = ["s3:GetObject", "s3:ListBucket"]
         Resource = [
           aws_s3_bucket.website_bucket.arn,
           "${aws_s3_bucket.website_bucket.arn}/*"
@@ -121,8 +121,8 @@ resource "aws_iam_role_policy" "secretary_policy_ttapp" {
       # LAMBDAS PERMITIDAS
       ###############################
       {
-        Effect   = "Allow"
-        Action   = ["lambda:InvokeFunction"]
+        Effect = "Allow"
+        Action = ["lambda:InvokeFunction"]
         Resource = [
           "arn:aws:lambda:us-east-1:*:function:UploadVoucher*",
           "arn:aws:lambda:us-east-1:*:function:inscripcionesLambda*"
@@ -151,10 +151,52 @@ resource "aws_iam_role_policy" "secretary_policy_ttapp" {
       # CLOUDWATCH (solo lectura)
       ###############################
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "logs:GetLogEvents",
           "logs:DescribeLogStreams"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+##############################################
+# IAM Role para Lambda sendSms
+##############################################
+
+resource "aws_iam_role" "lambda_send_sms_role" {
+  name = "lambda-sendSms-exec-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect    = "Allow",
+      Principal = { Service = "lambda.amazonaws.com" },
+      Action    = "sts:AssumeRole"
+    }]
+  })
+}
+
+# Logs básicos
+resource "aws_iam_role_policy_attachment" "lambda_send_sms_basic_logs" {
+  role       = aws_iam_role.lambda_send_sms_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+# Permisos para usar SES (enviar emails) y opcionalmente SNS para SMS
+resource "aws_iam_role_policy" "lambda_send_sms_ses_policy" {
+  name = "lambda-sendSms-ses-policy"
+  role = aws_iam_role.lambda_send_sms_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ses:SendEmail",
+          "ses:SendRawEmail"
         ]
         Resource = "*"
       }

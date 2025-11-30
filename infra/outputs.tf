@@ -79,8 +79,10 @@ output "api_route_inscripciones" {
 # Lambda
 output "lambda_function_arn" {
   description = "ARN de la función Lambda (inscripciones)."
-  value       = var.lambda_arn
+  value       = module.inscripciones_lambda.lambda_arn
 }
+
+
 
 #  Generales
 output "aws_region" {

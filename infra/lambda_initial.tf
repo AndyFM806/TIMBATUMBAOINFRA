@@ -5,12 +5,12 @@ resource "aws_lambda_function" "initial_lambda" {
   runtime       = "python3.12"
 
   filename         = "${path.module}/../lambda/initial_lambda.zip"
-  source_code_hash = filebase64sha256("${path.module}/../lambda/initial_lambda.zip")
+  source_code_hash = filebase64sha256("${path.module}/../infra/lambda/initial_lambda.zip")
 
   environment {
     variables = {
-      STAGE          = var.stage
-      PAYMENT_QUEUE  = aws_sqs_queue.payment_queue.url
+      STAGE         = var.stage
+      PAYMENT_QUEUE = aws_sqs_queue.payment_queue.url
     }
   }
 

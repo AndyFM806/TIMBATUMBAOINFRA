@@ -10,7 +10,7 @@ variable "stage" {
   description = "Entorno lógico para tags y configuración (Dev/QA/Prod)."
   type        = string
   validation {
-    condition     = contains(["Dev","QA","Prod","dev","qa","prod"], var.stage)
+    condition     = contains(["Dev", "QA", "Prod", "dev", "qa", "prod"], var.stage)
     error_message = "stage debe ser uno de: Dev, QA o Prod (mayúscula o minúscula)."
   }
 }
@@ -76,4 +76,19 @@ variable "sqs_queue_name" {
     condition     = can(regex("^[A-Za-z0-9_-]{1,80}(\\.fifo)?$", var.sqs_queue_name))
     error_message = "sqs_queue_name: 1–80 chars, sin espacios; letras, números, - o _. Para FIFO debe terminar en .fifo."
   }
+}
+
+variable "send_sms_lambda_zip" {
+  description = "Ruta al ZIP con el código de la Lambda sendSms."
+  type        = string
+}
+variable "cloudfront_acm_certificate_arn" {
+  description = "ARN del certificado ACM para CloudFront (us-east-1)."
+  type        = string
+  default     = ""
+}
+
+variable "ses_sender_email" {
+  description = "Email verificado en SES que se usará como remitente (From)."
+  type        = string
 }

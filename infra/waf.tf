@@ -1,20 +1,24 @@
+##############################################
+# AWS WAF - Protege el API Gateway HTTP
+##############################################
 
-# AWS WAF (Protección para API Gateway)
-
-# Web ACL: define las reglas de protección
 resource "aws_wafv2_web_acl" "api_waf" {
   name        = "waf-apigateway-TTapp"
   description = "Web ACL para proteger el API Gateway de TimbaTumbaoApp"
-  scope       = "REGIONAL" # Requerido para API Gateway regionales
+  scope       = "REGIONAL" # Para API Gateway regional/HTTP
+
   default_action {
     allow {}
   }
 
-  # Reglas administradas por AWS
+  # Regla 1: CommonRuleSet
   rule {
     name     = "AWS-AWSManagedRulesCommonRuleSet"
     priority = 1
-    override_action { none {} }
+
+    override_action {
+      none {}
+    }
 
     statement {
       managed_rule_group_statement {
@@ -30,10 +34,14 @@ resource "aws_wafv2_web_acl" "api_waf" {
     }
   }
 
+  # Regla 2: SQLi
   rule {
     name     = "AWS-AWSManagedRulesSQLiRuleSet"
     priority = 2
-    override_action { none {} }
+
+    override_action {
+      none {}
+    }
 
     statement {
       managed_rule_group_statement {
@@ -49,10 +57,14 @@ resource "aws_wafv2_web_acl" "api_waf" {
     }
   }
 
+  # Regla 3: KnownBadInputs
   rule {
     name     = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
     priority = 3
-    override_action { none {} }
+
+    override_action {
+      none {}
+    }
 
     statement {
       managed_rule_group_statement {
@@ -68,10 +80,14 @@ resource "aws_wafv2_web_acl" "api_waf" {
     }
   }
 
+  # Regla 4: IP Reputation
   rule {
     name     = "AWS-AWSManagedRulesAmazonIpReputationList"
     priority = 4
-    override_action { none {} }
+
+    override_action {
+      none {}
+    }
 
     statement {
       managed_rule_group_statement {
@@ -87,6 +103,7 @@ resource "aws_wafv2_web_acl" "api_waf" {
     }
   }
 
+  # Configuración general del ACL
   visibility_config {
     cloudwatch_metrics_enabled = true
     metric_name                = "waf-apigateway-ttapp"
@@ -95,14 +112,18 @@ resource "aws_wafv2_web_acl" "api_waf" {
 
   tags = {
     Name        = "waf-apigateway-TTapp"
-    Environment = "Dev"
+    Environment = var.stage
   }
 }
 
-
+##############################################
 # Asociación del WAF con el API Gateway
+##############################################
+
+# OJO: aquí supongo que tienes un módulo "api" que expone el ARN del stage
+# Si aún no lo tienes, luego ajustamos esto; por ahora es sintaxis válida.
 
 resource "aws_wafv2_web_acl_association" "api_waf_association" {
-  resource_arn = aws_apigatewayv2_stage.prod.arn
+  resource_arn = module.api.api_stage_arn
   web_acl_arn  = aws_wafv2_web_acl.api_waf.arn
 }
