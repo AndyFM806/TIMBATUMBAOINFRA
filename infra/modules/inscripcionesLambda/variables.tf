@@ -27,3 +27,8 @@ variable "jar_path" {
   description = "Ruta al JAR desde el módulo raíz. (Se usa para el hash, aunque el local lo redefina)."
   type        = string
 }
+
+variable "sns_topic_arn" {
+  description = "ARN del topic SNS donde publicará la Lambda de inscripciones."
+  type        = string
+}

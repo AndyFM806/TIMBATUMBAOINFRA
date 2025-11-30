@@ -4,9 +4,9 @@ resource "aws_apigatewayv2_api" "http" {
   protocol_type = "HTTP"
 
   cors_configuration {
-    allow_origins = var.allowed_origins            # <-- faltaba
-    allow_methods = ["GET","POST","OPTIONS"]
-    allow_headers = ["content-type","authorization"]
+    allow_origins = var.allowed_origins
+    allow_methods = ["GET", "POST", "OPTIONS"]
+    allow_headers = ["content-type", "authorization"]
   }
 }
 
@@ -17,19 +17,21 @@ resource "aws_apigatewayv2_stage" "prod" {
   auto_deploy = true
 }
 
-# Integración Lambda (proxy v2)
+# Integración Lambda (Inscripciones)
 resource "aws_apigatewayv2_integration" "inscripciones" {
   api_id                 = aws_apigatewayv2_api.http.id
   integration_type       = "AWS_PROXY"
+  integration_method     = "POST"
   integration_uri        = var.lambda_arn
   payload_format_version = "2.0"
 }
 
-# Authorizer JWT (Cognito) opcional
+# Authorizer Cognito opcional
 resource "aws_apigatewayv2_authorizer" "cognito" {
-  count            = var.enable_cognito_auth && var.jwt_issuer != null && length(var.jwt_audiences) > 0 ? 1 : 0
+  count = var.enable_cognito_auth && var.jwt_issuer != null && length(var.jwt_audiences) > 0 ? 1 : 0
+
   api_id           = aws_apigatewayv2_api.http.id
-  name             = "cognito-jwt"
+  name             = "cognito-authorizer"
   authorizer_type  = "JWT"
   identity_sources = ["$request.header.Authorization"]
 
@@ -39,7 +41,7 @@ resource "aws_apigatewayv2_authorizer" "cognito" {
   }
 }
 
-# Ruta: POST /inscripciones (protegida si hay authorizer)
+# Ruta /inscripciones
 resource "aws_apigatewayv2_route" "inscripciones" {
   api_id    = aws_apigatewayv2_api.http.id
   route_key = "POST /inscripciones"

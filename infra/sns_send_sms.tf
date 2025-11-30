@@ -1,7 +1,13 @@
 ##############################################
+# SNS Topic - Notificaciones de inscripciones/pagos
+##############################################
+resource "aws_sns_topic" "payment_notifications" {
+  name = "tapp-payment-notifications"
+}
+
+##############################################
 # Módulo Lambda sendSms
 ##############################################
-
 module "send_sms_lambda" {
   source = "./modules/sendSmsLambda"
 
@@ -9,25 +15,15 @@ module "send_sms_lambda" {
   lambda_handler       = "handler.lambda_handler"
   runtime              = "python3.12"
   stage                = var.stage
+
+  aws_region      = var.aws_region
+  ddb_table_name  = var.ddb_table_name
+  lambda_zip_path = var.send_sms_lambda_zip
 }
 
 ##############################################
-# SNS Topic - Notificaciones de pago
+# SNS → Lambda sendSms
 ##############################################
-
-resource "aws_sns_topic" "payment_notifications" {
-  name = "ttapp-payment-notifications"
-
-  tags = {
-    Service     = "Pagos"
-    Environment = var.stage
-  }
-}
-
-##############################################
-# SNS -> Lambda sendSms
-##############################################
-
 resource "aws_sns_topic_subscription" "send_sms_subscription" {
   topic_arn = aws_sns_topic.payment_notifications.arn
   protocol  = "lambda"

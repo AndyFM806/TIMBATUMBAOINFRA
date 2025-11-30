@@ -18,3 +18,18 @@ variable "stage" {
   description = "Entorno lógico (Dev/QA/Prod)."
   type        = string
 }
+
+variable "aws_region" {
+  description = "Región AWS."
+  type        = string
+}
+
+variable "ddb_table_name" {
+  description = "Nombre de la tabla DynamoDB donde se registran los SMS/notificaciones."
+  type        = string
+}
+
+variable "lambda_zip_path" {
+  description = "Ruta al ZIP con el código de la Lambda sendSms."
+  type        = string
+}

@@ -9,8 +9,8 @@ module "inscripciones_lambda" {
   ddb_table_name       = var.ddb_table_name
   stage                = var.stage
   jar_path             = var.jar_path
+  sns_topic_arn        = aws_sns_topic.payment_notifications.arn
 }
-
 
 module "api" {
   source = "./modules/api"
@@ -18,7 +18,7 @@ module "api" {
   allowed_origins = var.allowed_origins
   lambda_arn      = module.inscripciones_lambda.lambda_arn
 
-  # Cognito (si lo usas)
+  # Cognito (opcional)
   enable_cognito_auth = var.enable_cognito_auth
   jwt_issuer          = var.jwt_issuer
   jwt_audiences       = var.jwt_audiences
