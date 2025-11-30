@@ -14,7 +14,6 @@ jenkins:
 
   disableRememberMe: false
 
-  # AQUÍ van las nubes, DENTRO de 'jenkins'
   clouds:
     - docker:
         name: "dind-cloud"
