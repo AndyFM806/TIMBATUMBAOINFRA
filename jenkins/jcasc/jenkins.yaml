@@ -10,8 +10,8 @@ jenkins:
   clouds:
     - docker:
         name: "docker-cloud"
-        dockerHost:
-          uri: "unix:///var/run/docker.sock"
+        dockerApi:
+          dockerHost: "unix:///var/run/docker.sock"
         templates:
           - labelString: "maven"
             dockerTemplateBase:
