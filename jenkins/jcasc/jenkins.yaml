@@ -1,4 +1,3 @@
-
 jenkins:
   systemMessage: "Jenkins configurado automáticamente con JCasC"
   security:
@@ -9,7 +8,6 @@ jenkins:
           password: "admin"
   clouds:
     - docker:
-        $class: "com.nirima.jenkins.plugins.docker.DockerCloud"
         name: "docker"
         dockerApi:
           dockerHost:
@@ -17,18 +15,20 @@ jenkins:
         templates:
           - labelString: "maven"
             connector:
-              $class: "io.jenkins.docker.connector.DockerComputerSSHConnector"
-              sshKeyStrategy: "sshKeyPath"
+              $class: "io.jenkins.docker.connector.DockerComputerAttachConnector"
+              user: "root"
             dockerTemplateBase:
-              image: "maven:3.9-eclipse-temurin-17"
+              image: "maven-agent"
             remoteFs: "/home/jenkins/agent"
+
           - labelString: "terraform"
             connector:
-              $class: "io.jenkins.docker.connector.DockerComputerSSHConnector"
-              sshKeyStrategy: "sshKeyPath"
+              $class: "io.jenkins.docker.connector.DockerComputerAttachConnector"
+              user: "root"
             dockerTemplateBase:
-              image: "hashicorp/terraform:1.7"
+              image: "terraform-agent"
             remoteFs: "/home/jenkins/agent"
+
 jobs:
   - script: >
       pipelineJob('timbatumbao-ci-cd') {
