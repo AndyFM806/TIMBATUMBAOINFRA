@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         AWS_DEFAULT_REGION = 'us-east-1'
-        TF_IN_AUTOMATION  = 'true'
+        TF_IN_AUTOMATION   = 'true'
     }
 
     stages {
@@ -28,25 +28,50 @@ pipeline {
             }
         }
 
-        stage('2. Test unitarios (Node)') {
-            agent { label 'node' }  // nodo Jenkins con Node/NPM instalado
+        stage('2. Checkov (seguridad IaC)') {
+            agent { label 'docker' }   // agente que tiene Docker CLI
             steps {
-                dir('frontend') {   // CAMBIA esto si tu código está en otra carpeta
+                dir('infra') {
+                    sh '''
+                        echo "[Checkov] Escaneando IaC..."
+
+                        # Descargar imagen (si ya está, solo verifica)
+                        docker pull bridgecrew/checkov:3 || true
+
+                        # Ejecutar Checkov montando la carpeta infra como /tf
+                        docker run --rm \
+                          -v "$PWD":/tf \
+                          --workdir /tf \
+                          bridgecrew/checkov:3 \
+                          --directory /tf \
+                          -o junitxml \
+                          --output-file-path results.xml
+                    '''
+
+                    // Publicar reporte de Checkov como tests JUnit
+                    junit 'results.xml'
+                }
+            }
+        }
+
+        stage('3. Test unitarios (Node)') {
+            agent { label 'node' }
+            steps {
+                dir('App/frontend') {   // ruta de tu frontend en el repo
                     sh '''
                         npm install
-                        # ejemplo: si tu script en package.json es "test": "vitest --run"
                         npm test -- --unit
                     '''
                 }
             }
         }
 
-        stage('3. Terraform Plan (preview)') {
+        stage('4. Terraform Plan (preview)') {
             agent { label 'terraform' }
             steps {
                 withCredentials([
                     usernamePassword(
-                        credentialsId: 'aws-credentials-00',   // ID lógico en Jenkins
+                        credentialsId: 'aws-credentials-00',
                         usernameVariable: 'AWS_ACCESS_KEY_ID',
                         passwordVariable: 'AWS_SECRET_ACCESS_KEY'
                     )
@@ -67,10 +92,8 @@ pipeline {
             }
         }
 
-        stage('4. Aprobación manual') {
-            when {
-                branch 'main'
-            }
+        stage('5. Aprobación manual') {
+            when { branch 'main' }
             agent none
             steps {
                 input message: '¿Aplicar cambios de Terraform en AWS con este plan?',
@@ -78,10 +101,8 @@ pipeline {
             }
         }
 
-        stage('5. Terraform Apply') {
-            when {
-                branch 'main'
-            }
+        stage('6. Terraform Apply') {
+            when { branch 'main' }
             agent { label 'terraform' }
             steps {
                 withCredentials([
