@@ -1,3 +1,4 @@
+
 # infra/networking.tf
 
 # VPC: Contenedor principal de la red
@@ -150,4 +151,36 @@ resource "aws_flow_log" "main" {
   log_destination = aws_cloudwatch_log_group.flow_logs.arn
   traffic_type    = "ALL"
   vpc_id          = aws_vpc.main.id
+}
+
+# Grupo de seguridad para el VPC Endpoint de CloudWatch
+resource "aws_security_group" "vpc_endpoint_sg" {
+  name        = "vpc-endpoint-sg"
+  description = "Allow TLS traffic for VPC endpoint"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.main.cidr_block]
+  }
+
+  tags = {
+    Name = "vpc-endpoint-sg"
+  }
+}
+
+# VPC Endpoint para CloudWatch Logs
+resource "aws_vpc_endpoint" "logs" {
+  vpc_id              = aws_vpc.main.id
+  service_name        = "com.amazonaws.${data.aws_region.current.name}.logs"
+  vpc_endpoint_type   = "Interface"
+  private_dns_enabled = true
+  subnet_ids          = [aws_subnet.private.id]
+  security_group_ids  = [aws_security_group.vpc_endpoint_sg.id]
+
+  tags = {
+    Name = "logs-vpc-endpoint"
+  }
 }
