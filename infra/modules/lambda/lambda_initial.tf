@@ -1,99 +1,100 @@
-# infra/modules/lambda/lambda_initial.tf
+variable "function_name" {
+  description = "The name of the Lambda function."
+  type        = string
+  default     = "EnrollmentRequestHandler"
+}
 
-# KMS Key for environment variable encryption
-resource "aws_kms_key" "initial_lambda_env_key" {
-  description             = "KMS key for encrypting Lambda environment variables for initial_lambda"
-  deletion_window_in_days = 7
-  enable_key_rotation   = true
+variable "source_file" {
+  description = "The path to the Lambda function's source code."
+  type        = string
+  default     = "../../lambda/initial_lambda.py"
+}
 
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Id      = "kms-key-policy",
+variable "payment_queue_url" {
+  description = "The URL of the SQS queue for payment processing."
+  type        = string
+}
+
+variable "kms_key_arn" {
+  description = "The ARN of the KMS key for encrypting environment variables."
+  type        = string
+}
+
+data "archive_file" "lambda_zip" {
+  type        = "zip"
+  source_file = var.source_file
+  output_path = "${path.module}/${var.function_name}.zip"
+}
+
+resource "aws_iam_role" "lambda_exec_role" {
+  name = "${var.function_name}-role"
+
+  assume_role_policy = jsonencode({
+    Version   = "2012-10-17",
     Statement = [
       {
-        Sid    = "Enable IAM User Permissions",
-        Effect = "Allow",
+        Action    = "sts:AssumeRole",
+        Effect    = "Allow",
         Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-        },
-        Action   = "kms:*",
-        Resource = "*"
+          Service = "lambda.amazonaws.com"
+        }
       }
     ]
   })
 }
 
-# Dead Letter Queue for the Lambda
-resource "aws_sqs_queue" "initial_lambda_dlq" {
-  name = "initial-lambda-dlq"
-  sqs_managed_sse_enabled = true
+resource "aws_iam_policy" "lambda_permissions" {
+  name        = "${var.function_name}-policy"
+  description = "Permissions for the ${var.function_name} Lambda function."
+
+  policy = jsonencode({
+    Version   = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = "sqs:SendMessage",
+        Resource = "*" # Simplified for this example, should be queue ARN in prod
+      },
+      {
+        Effect   = "Allow",
+        Action   = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Resource = "arn:aws:logs:*:*:*"
+      }
+    ]
+  })
 }
 
-# Security Group for the Lambda
-resource "aws_security_group" "initial_lambda_sg" {
-  name        = "initial-lambda-sg"
-  description = "Security group for the initial Lambda function"
-  vpc_id      = var.vpc_id # Assumes vpc_id is passed into the module
-
-  tags = {
-    Name = "initial-lambda-sg"
-  }
+resource "aws_iam_role_policy_attachment" "lambda_attach" {
+  role       = aws_iam_role.lambda_exec_role.name
+  policy_arn = aws_iam_policy.lambda_permissions.arn
 }
 
-# Code Signing configuration
-resource "aws_signer_signing_profile" "initial_lambda_signing_profile" {
-  platform_id = "AWSLambda-SHA384-ECDSA"
-}
+resource "aws_lambda_function" "this" {
+  function_name = var.function_name
+  role          = aws_iam_role.lambda_exec_role.arn
+  handler       = "initial_lambda.lambda_handler"
+  runtime       = "python3.9"
 
-resource "aws_lambda_code_signing_config" "initial_lambda_csc" {
-  allowed_publishers {
-    signing_profile_version_arns = [aws_signer_signing_profile.initial_lambda_signing_profile.arn]
+  filename         = data.archive_file.lambda_zip.output_path
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+
+  environment {
+    variables = {
+      PAYMENT_QUEUE_URL = var.payment_queue_url
+    }
   }
 
-  policies {
-    untrusted_artifact_on_deployment = "Enforce"
-  }
-}
-
-resource "aws_lambda_function" "initial_lambda" {
-  function_name = "Lambda-Initial"
-  role          = aws_iam_role.admin_role_ttapp.arn
-  handler       = var.lambda_handler
-  runtime       = "python3.12"
-
-  filename         = "${path.module}/../lambda/initial_lambda.zip"
-  source_code_hash = filebase64sha256("${path.module}/../lambda/initial_lambda.zip")
-
-  # Configurations to fix reported issues
-  reserved_concurrent_executions = 10
-  kms_key_arn                  = aws_kms_key.initial_lambda_env_key.arn
-
-  dead_letter_config {
-    target_arn = aws_sqs_queue.initial_lambda_dlq.arn
-  }
+  kms_key_arn = var.kms_key_arn
 
   tracing_config {
     mode = "Active"
   }
 
-  vpc_config {
-    subnet_ids         = var.subnet_ids # Assumes subnet_ids are passed into the module
-    security_group_ids = [aws_security_group.initial_lambda_sg.id]
-  }
-
-  code_signing_config_arn = aws_lambda_code_signing_config.initial_lambda_csc.arn
-
-  environment {
-    variables = {
-      STAGE         = var.stage
-      PAYMENT_QUEUE = aws_sqs_queue.payment_queue.url
-    }
-  }
-
   tags = {
-    Name        = "Lambda-Initial"
-    Environment = var.stage
+    Name = var.function_name
   }
 }
-
-data "aws_caller_identity" "current" {}
