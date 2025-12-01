@@ -19,35 +19,51 @@ jenkins:
         name: "dind-cloud"
         dockerApi:
           dockerHost:
-            uri: "tcp://docker-dind:2375"
+            uri: "tcp://docker-dind:2375"   # con tu docker-compose esto está OK
 
         templates:
 
+          # --- Agente para etapas Docker ---
           - name: "docker-agent"
             labelString: "docker"
             remoteFs: "/home/jenkins"
             instanceCapStr: "5"
             dockerTemplateBase:
-              image: "docker:27-dind"   
+              image: "jenkins/inbound-agent:alpine-jdk21"
               tty: true
             retentionStrategy:
               idleMinutes: 10
             connector:
               attach:
-                user: "root"             
+                user: "jenkins"
 
+          # --- Agente para Terraform (misma imagen base por simplicidad) ---
           - name: "terraform-agent"
             labelString: "terraform"
             remoteFs: "/home/jenkins"
             instanceCapStr: "5"
             dockerTemplateBase:
-              image: "hashicorp/terraform:1.14
+              image: "jenkins/inbound-agent:alpine-jdk21"
               tty: true
             retentionStrategy:
               idleMinutes: 10
             connector:
               attach:
-                user: "root"
+                user: "jenkins"
+
+          # --- Agente para Node (igual base) ---
+          - name: "node-agent"
+            labelString: "node"
+            remoteFs: "/home/jenkins"
+            instanceCapStr: "3"
+            dockerTemplateBase:
+              image: "jenkins/inbound-agent:alpine-jdk21"
+              tty: true
+            retentionStrategy:
+              idleMinutes: 5
+            connector:
+              attach:
+                user: "jenkins"
 
 jobs:
   - script: >
@@ -64,7 +80,6 @@ jobs:
                     steps {
                       sh 'echo Hola desde el agente Docker'
                       sh 'hostname'
-                      sh 'docker --version || echo "docker CLI no instalado"'
                     }
                   }
 
@@ -73,7 +88,14 @@ jobs:
                     steps {
                       sh 'echo Hola desde el agente Terraform'
                       sh 'hostname'
-                      sh 'terraform version || echo "Terraform no instalado"'
+                    }
+                  }
+
+                  stage('Probar agente Node') {
+                    agent { label 'node' }
+                    steps {
+                      sh 'echo Hola desde el agente Node'
+                      sh 'hostname'
                     }
                   }
                 }
