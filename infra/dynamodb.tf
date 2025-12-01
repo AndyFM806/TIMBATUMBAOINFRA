@@ -13,7 +13,8 @@ resource "aws_dynamodb_table" "inscripciones_table" {
   }
 
   server_side_encryption {
-    enabled = true
+    enabled     = true
+    kms_key_arn = aws_kms_key.dynamodb.arn
   }
 
   tags = {
@@ -21,4 +22,14 @@ resource "aws_dynamodb_table" "inscripciones_table" {
     Environment = var.stage
     Service     = "Inscripciones"
   }
+}
+
+resource "aws_kms_key" "dynamodb" {
+  description             = "KMS key for DynamoDB"
+  deletion_window_in_days = 7
+}
+
+resource "aws_kms_alias" "dynamodb" {
+  name          = "alias/dynamodb"
+  target_key_id = aws_kms_key.dynamodb.key_id
 }

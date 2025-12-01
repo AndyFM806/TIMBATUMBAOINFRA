@@ -41,12 +41,12 @@ jenkins:
             remoteFs: "/home/jenkins/agent"
 
 jobs:
-  - script: >
+  - script: |
       pipelineJob('timbatumbao-ci-cd') {
         definition {
           cps {
-            sandbox()
-            script('''
+            sandbox(true)
+            script = '''
 pipeline {
     agent none
 
@@ -68,11 +68,11 @@ pipeline {
             agent { label 'terraform' }
             steps {
                 dir('infra') {
-                    sh '''
+                    sh """
                         echo "[TF] Formateando y validando..."
                         terraform fmt -check
                         terraform validate
-                    '''
+                    """
                 }
             }
         }
@@ -81,11 +81,11 @@ pipeline {
             agent { label 'node' }  // nodo Jenkins con Node/NPM instalado
             steps {
                 dir('frontend') {   // CAMBIA esto si tu código está en otra carpeta
-                    sh '''
+                    sh """
                         npm install
                         # ejemplo: si tu script en package.json es "test": "vitest --run"
                         npm test -- --unit
-                    '''
+                    """
                 }
             }
         }
@@ -101,7 +101,7 @@ pipeline {
                     )
                 ]) {
                     dir('infra') {
-                        sh '''
+                        sh """
                             echo "[TF] Init..."
                             terraform init -input=false
 
@@ -110,7 +110,7 @@ pipeline {
                               -input=false \
                               -var-file=terraform.tfvars \
                               -out=tfplan
-                        '''
+                        """
                     }
                 }
             }
@@ -141,10 +141,10 @@ pipeline {
                     )
                 ]) {
                     dir('infra') {
-                        sh '''
+                        sh """
                             echo "[TF] Aplicando plan tfplan..."
                             terraform apply -input=false -auto-approve tfplan
-                        '''
+                        """
                     }
                 }
             }
@@ -160,7 +160,7 @@ pipeline {
         }
     }
 }
-            ''')
+'''
           }
         }
       }

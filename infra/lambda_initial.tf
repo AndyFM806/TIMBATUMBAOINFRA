@@ -36,7 +36,7 @@ resource "aws_lambda_function" "lambda_initial" {
   function_name = "LambdaInitial"
   role          = aws_iam_role.lambda_initial_role.arn
   handler       = "main.handler"
-  runtime       = "python3.9"
+  runtime       = "python3.12"
 
   filename         = data.archive_file.lambda_initial_zip.output_path
   source_code_hash = data.archive_file.lambda_initial_zip.output_base64sha256
