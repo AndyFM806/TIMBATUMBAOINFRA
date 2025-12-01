@@ -1,5 +1,5 @@
 module "enrollment_handler_lambda" {
-  source = "./modules/lambda/lambda_initial"
+  source = "./modules/lambda_initial"
 
   function_name     = "EnrollmentRequestHandler"
   payment_queue_url = module.timbatumbao_resources.payment_queue_url
@@ -7,7 +7,7 @@ module "enrollment_handler_lambda" {
 }
 
 module "payment_processor_lambda" {
-  source = "./modules/lambda/lambda_processor"
+  source = "./modules/lambda_processor"
 
   processor_function_name = "PaymentProcessor"
   payment_queue_arn      = module.timbatumbao_resources.payment_queue_arn
