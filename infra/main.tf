@@ -28,7 +28,8 @@ module "inscripciones_lambda" {
     jar_path             = "./modules/inscripcionesLambda/java/target/inscripciones.jar"
     stage                = "prod"
     aws_region           = var.aws_region
-    sqs_queue_url        = module.timbatumbao_resources.sqs_queue_url
+    sqs_queue_arn        = module.timbatumbao_resources.sqs_queue_arn
+    ddb_table_name       = aws_dynamodb_table.inscripciones_table.name
     sns_topic_arn        = module.timbatumbao_resources.sns_topic_arn
     kms_key_arn          = module.timbatumbao_resources.kms_key_arn
     vpc_id               = aws_vpc.main.id
