@@ -7,7 +7,7 @@ resource "aws_kms_key" "timbatumbao_key" {
 
 # Tabla DynamoDB para almacenar las inscripciones
 resource "aws_dynamodb_table" "timbatumbao_table" {
-  name             = "timbatumbao_table"
+  name             = var.dynamodb_table_name
   billing_mode     = "PAY_PER_REQUEST"
   hash_key         = "PK" # Partition Key
   range_key        = "SK" # Sort Key
@@ -42,6 +42,6 @@ resource "aws_sqs_queue" "payment_queue" {
 
 # Tema SNS para notificar los resultados de la inscripción
 resource "aws_sns_topic" "timbatumbao_notifications" {
-  name              = "timbatumbao-notifications-topic"
+  name              = var.sns_notifications_topic_name
   kms_master_key_id = aws_kms_key.timbatumbao_key.arn
 }
