@@ -83,7 +83,7 @@ resource "aws_iam_role_policy_attachment" "lambda_pagos_dlq_attachment" {
 # Dead Letter Queue (DLQ) for Lambda
 resource "aws_sqs_queue" "lambda_pagos_dlq" {
   name = "lambda-pagos-dlq"
-  kms_master_key_id = aws_kms_key.dynamodb.arn
+  kms_master_key_id = aws_kms_key.encryption_key.arn
   kms_data_key_reuse_period_seconds = 300
 }
 

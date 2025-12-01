@@ -75,7 +75,7 @@ resource "aws_security_group" "lambda_initial_sg" {
 # Dead Letter Queue (DLQ) for Lambda
 resource "aws_sqs_queue" "lambda_initial_dlq" {
   name                              = "lambda-initial-dlq"
-  kms_master_key_id                 = aws_kms_key.dynamodb.arn
+  kms_master_key_id                 = aws_kms_key.encryption_key.arn
   kms_data_key_reuse_period_seconds = 300
 }
 
