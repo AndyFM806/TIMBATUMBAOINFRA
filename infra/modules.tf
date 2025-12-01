@@ -15,11 +15,13 @@ module "inscripciones_lambda" {
 module "api" {
   source = "./modules/api"
 
-  allowed_origins = var.allowed_origins
-  lambda_arn      = module.inscripciones_lambda.lambda_arn
+  allowed_origins    = var.allowed_origins
+  lambda_arn         = module.inscripciones_lambda.lambda_arn
+  lambda_initial_arn = aws_lambda_function.lambda_initial.arn
+  lambda_pagos_arn   = aws_lambda_function.lambda_pagos.arn
 
-  # Cognito (opcional)
-  enable_cognito_auth = var.enable_cognito_auth
-  jwt_issuer          = var.jwt_issuer
-  jwt_audiences       = var.jwt_audiences
+  # --- Cognito Activado ---
+  enable_cognito_auth = true # <-- Encendemos la autenticación
+  jwt_issuer          = aws_cognito_user_pool.user_pool.issuer
+  jwt_audiences       = [aws_cognito_user_pool_client.user_pool_client.id]
 }

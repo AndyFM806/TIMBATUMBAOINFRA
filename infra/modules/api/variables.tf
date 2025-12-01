@@ -8,6 +8,18 @@ variable "lambda_arn" {
   type        = string
 }
 
+variable "lambda_initial_arn" {
+  description = "ARN de la Lambda 'Initial' para la ruta GET /initial"
+  type        = string
+  default     = null
+}
+
+variable "lambda_pagos_arn" {
+  description = "ARN de la Lambda 'Pagos' para la ruta POST /pagos"
+  type        = string
+  default     = null
+}
+
 # --- Cognito (JWT) opcional ---
 variable "enable_cognito_auth" {
   description = "Habilitar authorizer JWT (Cognito)"

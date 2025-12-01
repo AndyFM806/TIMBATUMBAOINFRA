@@ -51,11 +51,73 @@ resource "aws_apigatewayv2_route" "inscripciones" {
   authorizer_id      = var.enable_cognito_auth && var.jwt_issuer != null && length(var.jwt_audiences) > 0 ? aws_apigatewayv2_authorizer.cognito[0].id : null
 }
 
-# Permiso APIGW -> Lambda
+# Permiso APIGW -> Lambda (Inscripciones) - Más seguro
 resource "aws_lambda_permission" "apigw_invoke_inscripciones" {
   statement_id  = "AllowAPIGWInvokeInscripciones"
   action        = "lambda:InvokeFunction"
   principal     = "apigateway.amazonaws.com"
   function_name = var.lambda_arn
-  source_arn    = "${aws_apigatewayv2_api.http.execution_arn}/*/*"
+  source_arn    = "${aws_apigatewayv2_api.http.execution_arn}/*/${aws_apigatewayv2_route.inscripciones.route_key}"
+}
+
+# --- Integración Lambda (Initial) ---
+resource "aws_apigatewayv2_integration" "initial" {
+  count = var.lambda_initial_arn != null ? 1 : 0
+
+  api_id                 = aws_apigatewayv2_api.http.id
+  integration_type       = "AWS_PROXY"
+  integration_method     = "POST"
+  integration_uri        = var.lambda_initial_arn
+  payload_format_version = "2.0"
+}
+
+# Ruta GET /initial
+resource "aws_apigatewayv2_route" "initial" {
+  count = var.lambda_initial_arn != null ? 1 : 0
+
+  api_id    = aws_apigatewayv2_api.http.id
+  route_key = "GET /initial"
+  target    = "integrations/${aws_apigatewayv2_integration.initial[0].id}"
+}
+
+# Permiso APIGW -> Lambda (Initial)
+resource "aws_lambda_permission" "apigw_invoke_initial" {
+  count = var.lambda_initial_arn != null ? 1 : 0
+
+  statement_id  = "AllowAPIGWInvokeInitial"
+  action        = "lambda:InvokeFunction"
+  principal     = "apigateway.amazonaws.com"
+  function_name = var.lambda_initial_arn
+  source_arn    = "${aws_apigatewayv2_api.http.execution_arn}/*/${aws_apigatewayv2_route.initial[0].route_key}"
+}
+
+# --- Integración Lambda (Pagos) ---
+resource "aws_apigatewayv2_integration" "pagos" {
+  count = var.lambda_pagos_arn != null ? 1 : 0
+
+  api_id                 = aws_apigatewayv2_api.http.id
+  integration_type       = "AWS_PROXY"
+  integration_method     = "POST"
+  integration_uri        = var.lambda_pagos_arn
+  payload_format_version = "2.0"
+}
+
+# Ruta POST /pagos
+resource "aws_apigatewayv2_route" "pagos" {
+  count = var.lambda_pagos_arn != null ? 1 : 0
+
+  api_id    = aws_apigatewayv2_api.http.id
+  route_key = "POST /pagos"
+  target    = "integrations/${aws_apigatewayv2_integration.pagos[0].id}"
+}
+
+# Permiso APIGW -> Lambda (Pagos)
+resource "aws_lambda_permission" "apigw_invoke_pagos" {
+  count = var.lambda_pagos_arn != null ? 1 : 0
+
+  statement_id  = "AllowAPIGWInvokePagos"
+  action        = "lambda:InvokeFunction"
+  principal     = "apigateway.amazonaws.com"
+  function_name = var.lambda_pagos_arn
+  source_arn    = "${aws_apigatewayv2_api.http.execution_arn}/*/${aws_apigatewayv2_route.pagos[0].route_key}"
 }

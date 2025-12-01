@@ -1,6 +1,6 @@
-jenkins:
-  systemMessage: "Jenkins configurado con acceso directo admin/admin"
 
+jenkins:
+  systemMessage: "Jenkins configurado con agentes personalizados y Docker-out-of-Docker"
   securityRealm:
     local:
       allowsSignup: false
@@ -12,24 +12,22 @@ jenkins:
     loggedInUsersCanDoAnything:
       allowAnonymousRead: false
 
-  disableRememberMe: false
-
   clouds:
     - docker:
-        name: "dind-cloud"
+        name: "docker-host-cloud"
         dockerApi:
+          # Usa el socket montado del host
           dockerHost:
-            uri: "tcp://docker-dind:2375"   # con tu docker-compose esto está OK
+            uri: "unix:///var/run/docker.sock"
 
         templates:
-
-          # --- Agente para etapas Docker ---
-          - name: "docker-agent"
-            labelString: "docker"
+          # --- Agente para Maven ---
+          - name: "maven-agent"
+            labelString: "maven"
             remoteFs: "/home/jenkins"
             instanceCapStr: "5"
             dockerTemplateBase:
-              image: "jenkins/inbound-agent:alpine-jdk21"
+              image: "maven-agent:latest" # Nuestra imagen personalizada
               tty: true
             retentionStrategy:
               idleMinutes: 10
@@ -37,13 +35,13 @@ jenkins:
               attach:
                 user: "jenkins"
 
-          # --- Agente para Terraform (misma imagen base por simplicidad) ---
+          # --- Agente para Terraform ---
           - name: "terraform-agent"
             labelString: "terraform"
             remoteFs: "/home/jenkins"
             instanceCapStr: "5"
             dockerTemplateBase:
-              image: "jenkins/inbound-agent:alpine-jdk21"
+              image: "terraform-agent:latest" # Nuestra imagen personalizada
               tty: true
             retentionStrategy:
               idleMinutes: 10
@@ -51,57 +49,4 @@ jenkins:
               attach:
                 user: "jenkins"
 
-          # --- Agente para Node (igual base) ---
-          - name: "node-agent"
-            labelString: "node"
-            remoteFs: "/home/jenkins"
-            instanceCapStr: "3"
-            dockerTemplateBase:
-              image: "jenkins/inbound-agent:alpine-jdk21"
-              tty: true
-            retentionStrategy:
-              idleMinutes: 5
-            connector:
-              attach:
-                user: "jenkins"
-
-jobs:
-  - script: >
-      pipelineJob('infra-dind-job') {
-        definition {
-          cps {
-            script("""
-              pipeline {
-                agent none
-
-                stages {
-                  stage('Probar agente Docker') {
-                    agent { label 'docker' }
-                    steps {
-                      sh 'echo Hola desde el agente Docker'
-                      sh 'hostname'
-                    }
-                  }
-
-                  stage('Probar agente Terraform') {
-                    agent { label 'terraform' }
-                    steps {
-                      sh 'echo Hola desde el agente Terraform'
-                      sh 'hostname'
-                    }
-                  }
-
-                  stage('Probar agente Node') {
-                    agent { label 'node' }
-                    steps {
-                      sh 'echo Hola desde el agente Node'
-                      sh 'hostname'
-                    }
-                  }
-                }
-              }
-            """)
-            sandbox()
-          }
-        }
-      }
+# Eliminamos el job incrustado, usaremos un Jenkinsfile en el repo.
