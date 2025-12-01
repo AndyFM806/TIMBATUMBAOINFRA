@@ -111,7 +111,7 @@ resource "aws_cloudwatch_dashboard" "main_dashboard" {
         height = 6,
         properties = {
           metrics = [
-            ["AWS/SNS", "NumberOfMessagesPublished", "TopicName", module.core_resources.timbatumbao_notifications_topic_name, { "stat" = "Sum" }]
+            ["AWS/SNS", "NumberOfMessagesPublished", "TopicName", module.core_resources.timbatumbao_notifications_topic_arn, { "stat" = "Sum" }]
           ],
           view   = "timeSeries",
           region = var.aws_region,

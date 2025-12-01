@@ -21,3 +21,15 @@ variable "sns_notifications_topic_name" {
   type        = string
   default     = "timbatumbao-notifications-topic"
 }
+
+variable "stage" {
+  description = "The deployment stage."
+  type        = string
+  default     = "dev"
+}
+
+variable "ddb_table_name" {
+  description = "The name of the DynamoDB table."
+  type        = string
+  default     = "timbatumbao-inscriptions-table"
+}
