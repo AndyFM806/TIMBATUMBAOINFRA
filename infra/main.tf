@@ -58,7 +58,6 @@ module "lambda_notificaciones" {
   subnet_ids           = [aws_subnet.private.id]
 }
 
-
 module "api" {
   source = "./modules/api"
 

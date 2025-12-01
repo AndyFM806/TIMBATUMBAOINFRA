@@ -4,12 +4,12 @@ variable "aws_region" {
 }
 
 variable "lambda_function_name" {
-  description = "Nombre de la función Lambda (ej: Notifier)."
+  description = "Nombre de la función Lambda (ej: PaymentProcessor)."
   type        = string
 }
 
 variable "lambda_handler" {
-  description = "Handler Java (ej: com.academiabaile.backend.handlers.NotificationHandler::handleRequest)."
+  description = "Handler Java (ej: com.academiabaile.backend.handlers.PaymentProcessorHandler)."
   type        = string
 }
 
@@ -23,8 +23,18 @@ variable "stage" {
   type        = string
 }
 
+variable "ddb_table_name" {
+  description = "Nombre de la tabla DynamoDB usada por la Lambda."
+  type        = string
+}
+
 variable "sns_topic_arn" {
-  description = "ARN del topic SNS donde publicará la Lambda de notificaciones."
+  description = "ARN del topic SNS donde publicará la Lambda de procesamiento."
+  type        = string
+}
+
+variable "sqs_queue_arn" {
+  description = "ARN de la cola SQS que triggera esta Lambda."
   type        = string
 }
 
