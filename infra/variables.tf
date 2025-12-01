@@ -1,3 +1,4 @@
+
 variable "aws_region" {
   description = "The AWS region to deploy resources."
   type        = string
@@ -7,13 +8,13 @@ variable "aws_region" {
 variable "sqs_queue_name" {
   description = "The name of the SQS queue."
   type        = string
-  default     = "timbatumbao-payment-queue"
+  default     = "inscripciones-queue"
 }
 
 variable "dynamodb_table_name" {
   description = "The name of the DynamoDB table."
   type        = string
-  default     = "timbatumbao-inscriptions-table"
+  default     = "InscripcionesTable"
 }
 
 variable "sns_notifications_topic_name" {
