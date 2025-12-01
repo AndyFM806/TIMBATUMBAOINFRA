@@ -1,12 +1,17 @@
-# Clave KMS para cifrar los recursos de la aplicación
-resource "aws_kms_key" "timbatumbao_key" {
-  description             = "KMS key for Timbatumbao application resources"
-  deletion_window_in_days = 10
-  enable_key_rotation   = true
+resource "aws_sns_topic" "notifications" {
+  name = var.sns_notifications_topic_name
+  kms_master_key_id = aws_kms_key.encryption_key.id
 }
 
-# Tema SNS para notificar los resultados de la inscripción
-resource "aws_sns_topic" "timbatumbao_notifications" {
-  name              = var.sns_notifications_topic_name
-  kms_master_key_id = aws_kms_key.timbatumbao_key.arn
+resource "aws_kms_key" "encryption_key" {
+  description             = "KMS key for encrypting resources"
+  deletiopen_window_in_hours = 7
+}
+
+resource "aws_sqs_queue" "inscripciones_queue" {
+  name                        = var.sqs_queue_name
+  kms_master_key_id           = aws_kms_key.encryption_key.id
+  kms_data_key_reuse_period_seconds = 300
+  receive_wait_time_seconds   = 10
+  visibility_timeout_seconds  = 300
 }

@@ -58,10 +58,10 @@ resource "aws_cloudwatch_dashboard" "main_dashboard" {
         height = 6,
         properties = {
           metrics = [
-            ["AWS/Lambda", "Invocations", "FunctionName", module.enrollment_handler.name, { "stat" = "Sum", "label" = "Inscripciones (Invocaciones)" }],
-            ["AWS/Lambda", "Errors", "FunctionName", module.enrollment_handler.name, { "stat" = "Sum", "label" = "Inscripciones (Errores)" }],
-            ["AWS/Lambda", "Invocations", "FunctionName", module.payment_processor.name, { "stat" = "Sum", "label" = "Pagos (Invocaciones)" }],
-            ["AWS/Lambda", "Errors", "FunctionName", module.payment_processor.name, { "stat" = "Sum", "label" = "Pagos (Errores)" }]
+            ["AWS/Lambda", "Invocations", "FunctionName", module.inscripciones_lambda.lambda_function_name, { "stat" = "Sum", "label" = "Inscripciones (Invocaciones)" }],
+            ["AWS/Lambda", "Errors", "FunctionName", module.inscripciones_lambda.lambda_function_name, { "stat" = "Sum", "label" = "Inscripciones (Errores)" }],
+            ["AWS/Lambda", "Invocations", "FunctionName", module.lambda_processor.lambda_function_name, { "stat" = "Sum", "label" = "Pagos (Invocaciones)" }],
+            ["AWS/Lambda", "Errors", "FunctionName", module.lambda_processor.lambda_function_name, { "stat" = "Sum", "label" = "Pagos (Errores)" }]
           ],
           view   = "timeSeries",
           region = var.aws_region,
@@ -77,8 +77,8 @@ resource "aws_cloudwatch_dashboard" "main_dashboard" {
         height = 6,
         properties = {
           metrics = [
-            ["AWS/Lambda", "Invocations", "FunctionName", module.notifier.name, { "stat" = "Sum", "label" = "Notificaciones (Invocaciones)" }],
-            ["AWS/Lambda", "Errors", "FunctionName", module.notifier.name, { "stat" = "Sum", "label" = "Notificaciones (Errores)" }]
+            ["AWS/Lambda", "Invocations", "FunctionName", module.lambda_notificaciones.lambda_function_name, { "stat" = "Sum", "label" = "Notificaciones (Invocaciones)" }],
+            ["AWS/Lambda", "Errors", "FunctionName", module.lambda_notificaciones.lambda_function_name, { "stat" = "Sum", "label" = "Notificaciones (Errores)" }]
           ],
           view   = "timeSeries",
           region = var.aws_region,
@@ -111,7 +111,7 @@ resource "aws_cloudwatch_dashboard" "main_dashboard" {
         height = 6,
         properties = {
           metrics = [
-            ["AWS/SNS", "NumberOfMessagesPublished", "TopicName", module.core_resources.timbatumbao_notifications_topic_arn, { "stat" = "Sum" }]
+            ["AWS/SNS", "NumberOfMessagesPublished", "TopicName", "timbatumbao-notifications", { "stat" = "Sum" }]
           ],
           view   = "timeSeries",
           region = var.aws_region,

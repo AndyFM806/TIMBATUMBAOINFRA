@@ -1,11 +1,14 @@
-# --- outputs del módulo timbatumbao_resources ---
-
-output "timbatumbao_kms_key_arn" {
-  description = "ARN de la clave KMS para cifrar los recursos de la aplicación"
-  value       = aws_kms_key.timbatumbao_key.arn
+output "kms_key_arn" {
+  description = "The ARN of the KMS key."
+  value       = aws_kms_key.encryption_key.arn
 }
 
-output "timbatumbao_notifications_topic_arn" {
-  description = "ARN del tema SNS para notificaciones"
-  value       = aws_sns_topic.timbatumbao_notifications.arn
+output "sns_topic_arn" {
+  description = "The ARN of the SNS topic."
+  value       = aws_sns_topic.notifications.arn
+}
+
+output "sqs_queue_arn" {
+  description = "The ARN of the SQS queue."
+  value       = aws_sqs_queue.inscripciones_queue.arn
 }

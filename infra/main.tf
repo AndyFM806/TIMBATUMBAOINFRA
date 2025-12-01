@@ -38,7 +38,7 @@ module "lambda_processor" {
   aws_region           = var.aws_region
   ddb_table_name       = aws_dynamodb_table.inscripciones_table.name
   sns_topic_arn        = module.timbatumbao_resources.sns_topic_arn
-  sqs_queue_arn        = aws_sqs_queue.inscripciones_queue.arn
+  sqs_queue_arn        = module.timbatumbao_resources.sqs_queue_arn
   kms_key_arn          = module.timbatumbao_resources.kms_key_arn
   vpc_id               = aws_vpc.main.id
   subnet_ids           = [aws_subnet.private.id]
@@ -70,4 +70,5 @@ module "timbatumbao_resources" {
   source = "./modules/timbatumbao_resources"
 
   sns_notifications_topic_name = "timbatumbao-notifications"
+  sqs_queue_name               = "timbatumbao-inscripciones-queue"
 }
