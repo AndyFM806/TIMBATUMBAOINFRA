@@ -83,7 +83,7 @@ resource "aws_lambda_permission" "apigw_invoke_inscripciones" {
 
 # --- Integración Lambda (Initial) ---
 resource "aws_apigatewayv2_integration" "initial" {
-  count = var.lambda_initial_arn != null ? 1 : 0
+  count = var.enable_initial_route ? 1 : 0
 
   api_id                 = aws_apigatewayv2_api.http.id
   integration_type       = "AWS_PROXY"
@@ -94,7 +94,7 @@ resource "aws_apigatewayv2_integration" "initial" {
 
 # Ruta GET /initial
 resource "aws_apigatewayv2_route" "initial" {
-  count = var.lambda_initial_arn != null ? 1 : 0
+  count = var.enable_initial_route ? 1 : 0
 
   api_id    = aws_apigatewayv2_api.http.id
   route_key = "GET /initial"
@@ -106,7 +106,7 @@ resource "aws_apigatewayv2_route" "initial" {
 
 # Permiso APIGW -> Lambda (Initial)
 resource "aws_lambda_permission" "apigw_invoke_initial" {
-  count = var.lambda_initial_arn != null ? 1 : 0
+  count = var.enable_initial_route ? 1 : 0
 
   statement_id  = "AllowAPIGWInvokeInitial"
   action        = "lambda:InvokeFunction"

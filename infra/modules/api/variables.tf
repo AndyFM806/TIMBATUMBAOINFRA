@@ -14,6 +14,12 @@ variable "lambda_initial_arn" {
   default     = null
 }
 
+variable "enable_initial_route" {
+  description = "Enable the /initial route"
+  type        = bool
+  default     = false
+}
+
 variable "lambda_pagos_arn" {
   description = "ARN de la Lambda 'Pagos' para la ruta POST /pagos"
   type        = string
