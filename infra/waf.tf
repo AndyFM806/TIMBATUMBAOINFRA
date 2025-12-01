@@ -27,6 +27,12 @@ resource "aws_wafv2_web_acl" "api_gateway_waf" {
         }
       }
     }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "timbatumbao-SQLiRule"
+      sampled_requests_enabled   = true
+    }
   }
 
   # Regla para bloquear ataques XSS
@@ -48,6 +54,12 @@ resource "aws_wafv2_web_acl" "api_gateway_waf" {
           type     = "URL_DECODE"
         }
       }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "timbatumbao-XSSRule"
+      sampled_requests_enabled   = true
     }
   }
 
