@@ -22,6 +22,7 @@ module "api" {
   lambda_arn         = module.inscripciones_lambda.lambda_arn
   lambda_initial_arn = aws_lambda_function.lambda_initial.arn
   lambda_pagos_arn   = aws_lambda_function.lambda_pagos.arn
+  enable_pagos_route = true
 
   # --- Cognito Activado ---
   enable_cognito_auth = true # <-- Encendemos la autenticación

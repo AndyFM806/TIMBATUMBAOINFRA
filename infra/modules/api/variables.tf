@@ -20,6 +20,12 @@ variable "lambda_pagos_arn" {
   default     = null
 }
 
+variable "enable_pagos_route" {
+  description = "Enable the /pagos route"
+  type        = bool
+  default     = false
+}
+
 # --- Cognito (JWT) opcional ---
 variable "enable_cognito_auth" {
   description = "Habilitar authorizer JWT (Cognito)"

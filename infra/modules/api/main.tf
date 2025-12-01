@@ -117,7 +117,7 @@ resource "aws_lambda_permission" "apigw_invoke_initial" {
 
 # --- Integración Lambda (Pagos) ---
 resource "aws_apigatewayv2_integration" "pagos" {
-  count = var.lambda_pagos_arn != null ? 1 : 0
+  count = var.enable_pagos_route ? 1 : 0
 
   api_id                 = aws_apigatewayv2_api.http.id
   integration_type       = "AWS_PROXY"
@@ -128,7 +128,7 @@ resource "aws_apigatewayv2_integration" "pagos" {
 
 # Ruta POST /pagos
 resource "aws_apigatewayv2_route" "pagos" {
-  count = var.lambda_pagos_arn != null ? 1 : 0
+  count = var.enable_pagos_route ? 1 : 0
 
   api_id    = aws_apigatewayv2_api.http.id
   route_key = "POST /pagos"
@@ -140,7 +140,7 @@ resource "aws_apigatewayv2_route" "pagos" {
 
 # Permiso APIGW -> Lambda (Pagos)
 resource "aws_lambda_permission" "apigw_invoke_pagos" {
-  count = var.lambda_pagos_arn != null ? 1 : 0
+  count = var.enable_pagos_route ? 1 : 0
 
   statement_id  = "AllowAPIGWInvokePagos"
   action        = "lambda:InvokeFunction"
