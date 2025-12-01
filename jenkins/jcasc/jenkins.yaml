@@ -66,41 +66,20 @@ jenkins:
 
 jobs:
   - script: >
-      pipelineJob('infra-dind-job') {
+      pipelineJob('timbatumbao-iac-pipeline') {
         definition {
-          cps {
-            script("""
-              pipeline {
-                agent none
-
-                stages {
-                  stage('Probar agente Docker') {
-                    agent { label 'docker' }
-                    steps {
-                      sh 'echo Hola desde el agente Docker'
-                      sh 'hostname'
-                    }
-                  }
-
-                  stage('Probar agente Terraform') {
-                    agent { label 'terraform' }
-                    steps {
-                      sh 'echo Hola desde el agente Terraform'
-                      sh 'hostname'
-                    }
-                  }
-
-                  stage('Probar agente Node') {
-                    agent { label 'node' }
-                    steps {
-                      sh 'echo Hola desde el agente Node'
-                      sh 'hostname'
-                    }
-                  }
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('https://github.com/AndyFM806/TIMBATUMBAOINFRA.git')
                 }
+                branches('*/main')
               }
-            """)
-            sandbox()
+            }
+            // Ruta del Jenkinsfile dentro del repo
+            scriptPath('jenkins/Jenkinsfile')  // o 'Jenkinsfile' si está en la raíz
           }
         }
       }
+
