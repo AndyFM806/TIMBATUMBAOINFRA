@@ -122,7 +122,7 @@ resource "aws_default_security_group" "default" {
 resource "aws_cloudwatch_log_group" "flow_logs" {
   name              = "tapp-vpc-flow-logs"
   retention_in_days = 365
-  kms_key_id        = aws_kms_key.dynamodb.arn # Re-using existing KMS key for encryption
+  kms_key_id        = aws_kms_key.encryption_key.arn # Re-using existing KMS key for encryption
 }
 
 resource "aws_iam_role" "flow_logs_role" {
