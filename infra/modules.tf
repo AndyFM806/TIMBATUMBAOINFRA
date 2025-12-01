@@ -9,8 +9,8 @@ module "inscripciones_lambda" {
   ddb_table_name       = var.ddb_table_name
   stage                = var.stage
   jar_path             = var.jar_path
-  sns_topic_arn        = aws_sns_topic.payment_notifications.arn
-  kms_key_arn          = aws_kms_key.dynamodb.arn
+  sns_topic_arn        = module.timbatumbao_resources.timbatumbao_notifications_topic_arn
+  kms_key_arn          = module.timbatumbao_resources.timbatumbao_kms_key_arn
   vpc_id               = aws_vpc.main.id
   subnet_ids           = [aws_subnet.private.id]
 }
@@ -20,8 +20,8 @@ module "api" {
 
   allowed_origins    = var.allowed_origins
   lambda_arn         = module.inscripciones_lambda.lambda_arn
-  lambda_initial_arn = aws_lambda_function.lambda_initial.arn
-  lambda_pagos_arn   = aws_lambda_function.lambda_pagos.arn
+  lambda_initial_arn = module.enrollment_handler_lambda.arn
+  lambda_pagos_arn   = module.payment_processor_lambda.arn
   enable_pagos_route = true
   enable_initial_route = true
 
@@ -29,5 +29,5 @@ module "api" {
   enable_cognito_auth = true # <-- Encendemos la autenticación
   jwt_issuer          = aws_cognito_user_pool.user_pool.endpoint
   jwt_audiences       = [aws_cognito_user_pool_client.user_pool_client.id]
-  kms_key_arn         = aws_kms_key.dynamodb.arn
+  kms_key_arn         = module.timbatumbao_resources.timbatumbao_kms_key_arn
 }

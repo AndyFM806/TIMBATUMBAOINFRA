@@ -62,3 +62,15 @@ variable "ses_sender_email" {
   type        = string
   default     = "noreply@example.com"
 }
+
+variable "cloudfront_acm_certificate_arn" {
+  description = "ARN del certificado ACM para CloudFront."
+  type        = string
+  default     = null
+}
+
+variable "sqs_queue_name" {
+  description = "Nombre de la cola SQS."
+  type        = string
+  default     = "timbatumbao-payment-queue"
+}

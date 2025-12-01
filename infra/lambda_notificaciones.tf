@@ -90,7 +90,7 @@ resource "aws_lambda_code_signing_config" "lambda_notificaciones_csc" {
 # Dead Letter Queue (DLQ) for Lambda
 resource "aws_sqs_queue" "lambda_notificaciones_dlq" {
   name = "lambda-notificaciones-dlq"
-  kms_master_key_id = aws_kms_key.dynamodb.arn
+  kms_master_key_id = module.timbatumbao_resources.timbatumbao_kms_key_arn
   kms_data_key_reuse_period_seconds = 300
 }
 
@@ -129,7 +129,7 @@ resource "aws_lambda_function" "lambda_notificaciones" {
 
 # 5. Suscribir la Lambda al Tema de SNS
 resource "aws_sns_topic_subscription" "lambda_notificaciones_subscription" {
-  topic_arn = aws_sns_topic.payment_notifications.arn
+  topic_arn = module.timbatumbao_resources.timbatumbao_notifications_topic_arn
   protocol  = "lambda"
   endpoint  = aws_lambda_function.lambda_notificaciones.arn
 }
@@ -140,5 +140,5 @@ resource "aws_lambda_permission" "sns_invoke_lambda" {
   action        = "lambda:InvokeFunction"
   principal     = "sns.amazonaws.com"
   function_name = aws_lambda_function.lambda_notificaciones.function_name
-  source_arn    = aws_sns_topic.payment_notifications.arn
+  source_arn    = module.timbatumbao_resources.timbatumbao_notifications_topic_arn
 }
