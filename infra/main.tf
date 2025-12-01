@@ -42,7 +42,7 @@ module "enrollment_handler" {
   source = "./modules/lambda_initial"
 
   function_name     = "EnrollmentRequestHandler"
-  source_file       = "../lambda/initial_lambda.py"
+  source_file       = "../App/lambdas/initial/index.js"
   payment_queue_url = module.core_resources.timbatumbao_queue_url
   kms_key_arn       = aws_kms_key.encryption_key.arn
 }
@@ -51,7 +51,7 @@ module "payment_processor" {
   source = "./modules/lambda_processor"
 
   processor_function_name = "PaymentProcessor"
-  processor_source_file   = "../lambda/payment_processor_lambda.py"
+  processor_source_file   = "../App/lambdas/pagos/main.py"
   payment_queue_arn       = module.core_resources.timbatumbao_queue_arn
   dynamodb_table_name     = module.core_resources.timbatumbao_table_name
   sns_topic_arn           = module.core_resources.timbatumbao_notifications_topic_arn
@@ -62,7 +62,7 @@ module "notifier" {
   source = "./modules/lambda_notificaciones"
 
   function_name = "Notifier"
-  source_file   = "../lambda/lambda_notificaciones.py"
+  source_file   = "../App/lambdas/notificaciones/main.py"
   sns_topic_arn = module.core_resources.timbatumbao_notifications_topic_arn
   kms_key_arn   = aws_kms_key.encryption_key.arn
 }
