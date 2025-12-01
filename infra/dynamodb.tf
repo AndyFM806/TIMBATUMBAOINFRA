@@ -12,11 +12,6 @@ resource "aws_dynamodb_table" "inscripciones_table" {
     enabled = true
   }
 
-  server_side_encryption {
-    enabled     = true
-    kms_key_arn = aws_kms_key.encryption_key.arn
-  }
-
   tags = {
     Name        = var.ddb_table_name
     Environment = var.stage
