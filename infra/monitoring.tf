@@ -58,8 +58,8 @@ resource "aws_cloudwatch_dashboard" "main_dashboard" {
         height = 6,
         properties = {
           metrics = [
-            ["AWS/Lambda", "Invocations", "FunctionName", module.inscripciones_lambda.lambda_function_name, { "stat" = "Sum", "label" = "Inscripciones (Invocaciones)" }],
-            ["AWS/Lambda", "Errors", "FunctionName", module.inscripciones_lambda.lambda_function_name, { "stat" = "Sum", "label" = "Inscripciones (Errores)" }],
+            ["AWS/Lambda", "Invocations", "FunctionName", module.inscripciones_lambda.lambda_name, { "stat" = "Sum", "label" = "Inscripciones (Invocaciones)" }],
+            ["AWS/Lambda", "Errors", "FunctionName", module.inscripciones_lambda.lambda_name, { "stat" = "Sum", "label" = "Inscripciones (Errores)" }],
             ["AWS/Lambda", "Invocations", "FunctionName", aws_lambda_function.lambda_pagos.function_name, { "stat" = "Sum", "label" = "Pagos (Invocaciones)" }],
             ["AWS/Lambda", "Errors", "FunctionName", aws_lambda_function.lambda_pagos.function_name, { "stat" = "Sum", "label" = "Pagos (Errores)" }]
           ],
