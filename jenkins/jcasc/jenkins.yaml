@@ -1,52 +1,39 @@
 
 jenkins:
-  systemMessage: "Jenkins configurado con agentes personalizados y Docker-out-of-Docker"
-  securityRealm:
+  systemMessage: "Jenkins configurado automáticamente con JCasC"
+  security:
     local:
       allowsSignup: false
       users:
         - id: "admin"
           password: "admin"
-
-  authorizationStrategy:
-    loggedInUsersCanDoAnything:
-      allowAnonymousRead: false
-
   clouds:
     - docker:
-        name: "docker-host-cloud"
-        dockerApi:
-          # Usa el socket montado del host
-          dockerHost:
-            uri: "unix:///var/run/docker.sock"
-
+        name: "docker-cloud"
+        dockerHost:
+          uri: "unix:///var/run/docker.sock"
         templates:
-          # --- Agente para Maven ---
-          - name: "maven-agent"
-            labelString: "maven"
-            remoteFs: "/home/jenkins"
-            instanceCapStr: "5"
-            dockerTemplateBase:
-              image: "maven-agent:latest" # Nuestra imagen personalizada
-              tty: true
-            retentionStrategy:
-              idleMinutes: 10
-            connector:
-              attach:
-                user: "jenkins"
-
-          # --- Agente para Terraform ---
-          - name: "terraform-agent"
-            labelString: "terraform"
-            remoteFs: "/home/jenkins"
-            instanceCapStr: "5"
-            dockerTemplateBase:
-              image: "terraform-agent:latest" # Nuestra imagen personalizada
-              tty: true
-            retentionStrategy:
-              idleMinutes: 10
-            connector:
-              attach:
-                user: "jenkins"
-
-# Eliminamos el job incrustado, usaremos un Jenkinsfile en el repo.
+          - label: "maven"
+            image: "maven:3.9-eclipse-temurin-17"
+            remoteFs: "/home/jenkins/agent"
+          - label: "terraform"
+            image: "hashicorp/terraform:1.7"
+            remoteFs: "/home/jenkins/agent"
+jobs:
+  - script: >
+      pipelineJob('timbatumbao-ci-cd') {
+        description('Pipeline de CI/CD para el proyecto Timbatumbao.')
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('https://github.com/AndyFM806/TIMBATUMBAOINFRA.git')
+                }
+                branch('main')
+              }
+            }
+            scriptPath('Jenkinsfile')
+          }
+        }
+      }
