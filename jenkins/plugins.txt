@@ -9,3 +9,5 @@ ssh-agent
 docker-workflow
 docker-plugin
 job-dsl
+junit
+pipeline-utility-steps

@@ -1,166 +1,106 @@
 jenkins:
-  systemMessage: "Jenkins configurado automáticamente con JCasC"
+  systemMessage: "Jenkins configurado con acceso directo admin/admin"
   securityRealm:
     local:
       allowsSignup: false
       users:
         - id: "admin"
           password: "admin"
+
   authorizationStrategy:
     loggedInUsersCanDoAnything:
       allowAnonymousRead: false
+
+  disableRememberMe: false
+
   clouds:
     - docker:
-        name: "docker"
+        name: "dind-cloud"
         dockerApi:
           dockerHost:
-            uri: "unix:///var/run/docker.sock"
+            uri: "tcp://docker-dind:2375"
+
         templates:
-          - labelString: "maven"
-            connector:
-              attach:
-                user: "jenkins"
-            dockerTemplateBase:
-              image: "maven-agent"
-            remoteFs: "/home/jenkins/agent"
 
-          - labelString: "terraform"
+          # Agente genérico para docker
+          - name: "docker-agent"
+            labelString: "docker"
+            remoteFs: "/home/jenkins"
+            instanceCapStr: "5"
+            dockerTemplateBase:
+              image: "jenkins/inbound-agent:alpine-jdk21"
+              tty: true
+            retentionStrategy:
+              idleMinutes: 10
             connector:
               attach:
                 user: "jenkins"
-            dockerTemplateBase:
-              image: "terraform-agent"
-            remoteFs: "/home/jenkins/agent"
 
-          - labelString: "node"
+          # Agente genérico para terraform
+          - name: "terraform-agent"
+            labelString: "terraform"
+            remoteFs: "/home/jenkins"
+            instanceCapStr: "5"
+            dockerTemplateBase:
+              image: "jenkins/inbound-agent:alpine-jdk21"
+              tty: true
+            retentionStrategy:
+              idleMinutes: 10
             connector:
               attach:
                 user: "jenkins"
+
+          # Agente genérico para Node (igual base, luego puedes hacer imagen custom)
+          - name: "node-agent"
+            labelString: "node"
+            remoteFs: "/home/jenkins"
+            instanceCapStr: "3"
             dockerTemplateBase:
-              image: "jenkins/inbound-agent:jdk17-node20"
-            remoteFs: "/home/jenkins/agent"
+              image: "jenkins/inbound-agent:alpine-jdk21"
+              tty: true
+            retentionStrategy:
+              idleMinutes: 5
+            connector:
+              attach:
+                user: "jenkins"
 
 jobs:
-  - script: |
-      pipelineJob('timbatumbao-ci-cd') {
+  - script: >
+      pipelineJob('infra-dind-job') {
         definition {
           cps {
-            sandbox(true)
-            script = '''
-pipeline {
-    agent none
+            script("""
+              pipeline {
+                agent none
 
-    environment {
-        AWS_DEFAULT_REGION = 'us-east-1'
-        TF_IN_AUTOMATION  = 'true'
-    }
-
-    stages {
-
-        stage('Checkout') {
-            agent { label 'terraform' }
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('1. Linting y validación Terraform') {
-            agent { label 'terraform' }
-            steps {
-                dir('infra') {
-                    sh """
-                        echo "[TF] Formateando y validando..."
-                        terraform fmt -check
-                        terraform validate
-                    """
-                }
-            }
-        }
-
-        stage('2. Test unitarios (Node)') {
-            agent { label 'node' }  // nodo Jenkins con Node/NPM instalado
-            steps {
-                dir('frontend') {   // CAMBIA esto si tu código está en otra carpeta
-                    sh """
-                        npm install
-                        # ejemplo: si tu script en package.json es "test": "vitest --run"
-                        npm test -- --unit
-                    """
-                }
-            }
-        }
-
-        stage('3. Terraform Plan (preview)') {
-            agent { label 'terraform' }
-            steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'aws-credentials-00',   // ID lógico en Jenkins
-                        usernameVariable: 'AWS_ACCESS_KEY_ID',
-                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
-                    )
-                ]) {
-                    dir('infra') {
-                        sh """
-                            echo "[TF] Init..."
-                            terraform init -input=false
-
-                            echo "[TF] Plan usando terraform.tfvars..."
-                            terraform plan \
-                              -input=false \
-                              -var-file=terraform.tfvars \
-                              -out=tfplan
-                        """
+                stages {
+                  stage('Probar agente Docker') {
+                    agent { label 'docker' }
+                    steps {
+                      sh 'echo Hola desde el agente Docker'
+                      sh 'hostname'
                     }
-                }
-            }
-        }
+                  }
 
-        stage('4. Aprobación manual') {
-            when {
-                branch 'main'
-            }
-            agent none
-            steps {
-                input message: '¿Aplicar cambios de Terraform en AWS con este plan?',
-                      ok: 'Aplicar IaC'
-            }
-        }
-
-        stage('5. Terraform Apply') {
-            when {
-                branch 'main'
-            }
-            agent { label 'terraform' }
-            steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'aws-credentials-00',
-                        usernameVariable: 'AWS_ACCESS_KEY_ID',
-                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
-                    )
-                ]) {
-                    dir('infra') {
-                        sh """
-                            echo "[TF] Aplicando plan tfplan..."
-                            terraform apply -input=false -auto-approve tfplan
-                        """
+                  stage('Probar agente Terraform') {
+                    agent { label 'terraform' }
+                    steps {
+                      sh 'echo Hola desde el agente Terraform'
+                      sh 'hostname'
                     }
-                }
-            }
-        }
-    }
+                  }
 
-    post {
-        success {
-            echo 'Despliegue de infraestructura (IaC) completado exitosamente.'
-        }
-        failure {
-            echo 'Error en el pipeline. Revisa la etapa fallida en Jenkins.'
-        }
-    }
-}
-'''
+                  stage('Probar agente Node') {
+                    agent { label 'node' }
+                    steps {
+                      sh 'echo Hola desde el agente Node'
+                      sh 'hostname'
+                    }
+                  }
+                }
+              }
+            """)
+            sandbox()
           }
         }
       }
