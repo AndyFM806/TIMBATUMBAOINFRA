@@ -7,17 +7,18 @@ data "archive_file" "lambda_pagos_zip" {
   output_path = "${path.module}/../dist/lambda_pagos.zip"
 }
 
-# 2. Grupo de Seguridad para la Lambda (permite todo el tráfico de salida)
+# 2. Grupo de Seguridad para la Lambda (permite tráfico HTTPS saliente)
 resource "aws_security_group" "lambda_pagos_sg" {
   name        = "lambda-pagos-sg"
-  description = "Permitir todo el tráfico saliente para la Lambda de Pagos"
+  description = "Permitir tráfico HTTPS saliente para la Lambda de Pagos"
   vpc_id      = aws_vpc.main.id
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1" # -1 significa todos los protocolos
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow outbound HTTPS to external payment APIs"
   }
 
   tags = {
@@ -43,16 +44,60 @@ resource "aws_iam_role" "lambda_pagos_role" {
   })
 }
 
-# 4. Adjuntar la política básica de ejecución
+# 4. Adjuntar políticas de ejecución al Rol
 resource "aws_iam_role_policy_attachment" "lambda_pagos_basic" {
   role       = aws_iam_role.lambda_pagos_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# 5. Adjuntar la política de acceso a la VPC
 resource "aws_iam_role_policy_attachment" "lambda_pagos_vpc" {
   role       = aws_iam_role.lambda_pagos_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_pagos_xray" {
+  role       = aws_iam_role.lambda_pagos_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
+}
+
+resource "aws_iam_policy" "lambda_pagos_dlq_policy" {
+  name        = "lambda_pagos_dlq_policy"
+  description = "Policy to allow lambda to send messages to SQS"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action   = "sqs:SendMessage",
+        Effect   = "Allow",
+        Resource = aws_sqs_queue.lambda_pagos_dlq.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_pagos_dlq_attachment" {
+  role       = aws_iam_role.lambda_pagos_role.name
+  policy_arn = aws_iam_policy.lambda_pagos_dlq_policy.arn
+}
+
+# Code Signing for Lambda
+resource "aws_signer_signing_profile" "lambda_pagos_signing_profile" {
+  platform_id = "AWSLambda-SHA384-ECDSA"
+}
+
+resource "aws_lambda_code_signing_config" "lambda_pagos_csc" {
+  allowed_publishers {
+    signing_profile_version_arns = [aws_signer_signing_profile.lambda_pagos_signing_profile.arn]
+  }
+
+  policies {
+    untrusted_artifact_on_deployment = "Enforce"
+  }
+}
+
+# Dead Letter Queue (DLQ) for Lambda
+resource "aws_sqs_queue" "lambda_pagos_dlq" {
+  name = "lambda-pagos-dlq"
 }
 
 # 6. Crear la Función Lambda en AWS
@@ -60,22 +105,32 @@ resource "aws_lambda_function" "lambda_pagos" {
   function_name = "LambdaPagos"
   role          = aws_iam_role.lambda_pagos_role.arn
   handler       = "main.handler"
-  runtime       = "python3.9"
+  runtime       = "python3.12"
 
   filename         = data.archive_file.lambda_pagos_zip.output_path
   source_code_hash = data.archive_file.lambda_pagos_zip.output_base64sha256
-  timeout          = 30 # Aumentamos el timeout por si la API externa tarda en responder
+  timeout          = 30
 
-  # Conectar la Lambda a la VPC y Subred Privada
+  code_signing_config_arn = aws_lambda_code_signing_config.lambda_pagos_csc.arn
+
+  dead_letter_config {
+    target_arn = aws_sqs_queue.lambda_pagos_dlq.arn
+  }
+
+  tracing_config {
+    mode = "Active"
+  }
+
   vpc_config {
     subnet_ids         = [aws_subnet.private.id]
     security_group_ids = [aws_security_group.lambda_pagos_sg.id]
   }
 
+  reserved_concurrent_executions = 10
+
   tags = {
     Name = "LambdaPagos"
   }
 
-  # Nos aseguramos de que la NAT Gateway exista antes de crear la Lambda
   depends_on = [aws_nat_gateway.main]
 }

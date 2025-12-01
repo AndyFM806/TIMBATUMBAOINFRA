@@ -10,11 +10,33 @@ resource "aws_apigatewayv2_api" "http" {
   }
 }
 
+# CloudWatch Log Group for Access Logs
+resource "aws_cloudwatch_log_group" "api_gateway_access_logs" {
+  name              = "/aws/apigateway/${aws_apigatewayv2_api.http.name}/prod"
+  retention_in_days = 30
+}
+
 # Stage
 resource "aws_apigatewayv2_stage" "prod" {
   api_id      = aws_apigatewayv2_api.http.id
   name        = "prod"
   auto_deploy = true
+
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.api_gateway_access_logs.arn
+    format = jsonencode({
+      "requestId" : "$context.requestId",
+      "ip" : "$context.identity.sourceIp",
+      "requestTime" : "$context.requestTime",
+      "httpMethod" : "$context.httpMethod",
+      "routeKey" : "$context.routeKey",
+      "status" : "$context.status",
+      "protocol" : "$context.protocol",
+      "responseLength" : "$context.responseLength"
+    })
+  }
+
+  depends_on = [aws_cloudwatch_log_group.api_gateway_access_logs]
 }
 
 # Integración Lambda (Inscripciones)
@@ -26,10 +48,8 @@ resource "aws_apigatewayv2_integration" "inscripciones" {
   payload_format_version = "2.0"
 }
 
-# Authorizer Cognito opcional
+# Authorizer Cognito (ahora es obligatorio)
 resource "aws_apigatewayv2_authorizer" "cognito" {
-  count = var.enable_cognito_auth && var.jwt_issuer != null && length(var.jwt_audiences) > 0 ? 1 : 0
-
   api_id           = aws_apigatewayv2_api.http.id
   name             = "cognito-authorizer"
   authorizer_type  = "JWT"
@@ -47,8 +67,8 @@ resource "aws_apigatewayv2_route" "inscripciones" {
   route_key = "POST /inscripciones"
   target    = "integrations/${aws_apigatewayv2_integration.inscripciones.id}"
 
-  authorization_type = var.enable_cognito_auth && var.jwt_issuer != null && length(var.jwt_audiences) > 0 ? "JWT" : "NONE"
-  authorizer_id      = var.enable_cognito_auth && var.jwt_issuer != null && length(var.jwt_audiences) > 0 ? aws_apigatewayv2_authorizer.cognito[0].id : null
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
 
 # Permiso APIGW -> Lambda (Inscripciones) - Más seguro
@@ -78,6 +98,9 @@ resource "aws_apigatewayv2_route" "initial" {
   api_id    = aws_apigatewayv2_api.http.id
   route_key = "GET /initial"
   target    = "integrations/${aws_apigatewayv2_integration.initial[0].id}"
+  
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
 
 # Permiso APIGW -> Lambda (Initial)
@@ -109,6 +132,9 @@ resource "aws_apigatewayv2_route" "pagos" {
   api_id    = aws_apigatewayv2_api.http.id
   route_key = "POST /pagos"
   target    = "integrations/${aws_apigatewayv2_integration.pagos[0].id}"
+
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
 
 # Permiso APIGW -> Lambda (Pagos)
