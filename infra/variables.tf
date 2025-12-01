@@ -33,3 +33,27 @@ variable "ddb_table_name" {
   type        = string
   default     = "timbatumbao-inscriptions-table"
 }
+
+variable "allowed_origins" {
+  description = "Allowed origins for CORS"
+  type        = list(string)
+  default     = ["*"]
+}
+
+variable "enable_cognito_auth" {
+  description = "Enable Cognito JWT authorizer"
+  type        = bool
+  default     = false
+}
+
+variable "jwt_issuer" {
+  description = "Cognito issuer URL"
+  type        = string
+  default     = null
+}
+
+variable "jwt_audiences" {
+  description = "Cognito audiences"
+  type        = list(string)
+  default     = []
+}
