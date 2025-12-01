@@ -22,6 +22,6 @@ module "api" {
 
   # --- Cognito Activado ---
   enable_cognito_auth = true # <-- Encendemos la autenticación
-  jwt_issuer          = aws_cognito_user_pool.user_pool.issuer
+  jwt_issuer          = aws_cognito_user_pool.user_pool.endpoint
   jwt_audiences       = [aws_cognito_user_pool_client.user_pool_client.id]
 }
