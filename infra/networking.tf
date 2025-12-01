@@ -10,13 +10,12 @@ resource "aws_vpc" "main" {
 }
 
 # Subred Pública: Para recursos con acceso a Internet (ej. NAT Gateway)
-# checkov:skip=CKV_AWS_130:Public subnets are intended to have public IPs
 resource "aws_subnet" "public" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.0.1.0/24"
   availability_zone = "us-east-1a" # Se puede parametrizar si es necesario
 
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
 
   tags = {
     Name = "tapp-subnet-public"
@@ -121,7 +120,9 @@ resource "aws_default_security_group" "default" {
 
 # --- VPC Flow Logs ---
 resource "aws_cloudwatch_log_group" "flow_logs" {
-  name = "tapp-vpc-flow-logs"
+  name              = "tapp-vpc-flow-logs"
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.dynamodb.arn # Re-using existing KMS key for encryption
 }
 
 resource "aws_iam_role" "flow_logs_role" {
