@@ -8,20 +8,21 @@ jenkins:
         - id: "admin"
           password: "admin"
   clouds:
-    - $class: "com.nirima.jenkins.plugins.docker.DockerCloud"
-      name: "docker"
-      dockerApi:
-        dockerHost:
-          uri: "unix:///var/run/docker.sock"
-      templates:
-        - labelString: "maven"
-          dockerTemplateBase:
-            image: "maven:3.9-eclipse-temurin-17"
-          remoteFs: "/home/jenkins/agent"
-        - labelString: "terraform"
-          dockerTemplateBase:
-            image: "hashicorp/terraform:1.7"
-          remoteFs: "/home/jenkins/agent"
+    - docker:
+        $class: "com.nirima.jenkins.plugins.docker.DockerCloud"
+        name: "docker"
+        dockerApi:
+          dockerHost:
+            uri: "unix:///var/run/docker.sock"
+        templates:
+          - labelString: "maven"
+            dockerTemplateBase:
+              image: "maven:3.9-eclipse-temurin-17"
+            remoteFs: "/home/jenkins/agent"
+          - labelString: "terraform"
+            dockerTemplateBase:
+              image: "hashicorp/terraform:1.7"
+            remoteFs: "/home/jenkins/agent"
 jobs:
   - script: >
       pipelineJob('timbatumbao-ci-cd') {
