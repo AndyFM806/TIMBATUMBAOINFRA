@@ -32,6 +32,48 @@ module "core_resources" {
 resource "aws_kms_key" "encryption_key" {
   description = "KMS key for encrypting TappInscripciones environment variables"
   is_enabled  = true
+  policy      = <<EOF
+  {
+    "Id": "key-default-1",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Enable IAM User Permissions",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": "arn:aws:iam::327903111118:root"
+        },
+        "Action": "kms:*",
+        "Resource": "*"
+      },
+      {
+        "Sid": "Allow access for CloudWatch Logs",
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "logs.us-east-1.amazonaws.com"
+        },
+        "Action": [
+          "kms:CreateGrant",
+          "kms:DescribeKey",
+          "kms:Encrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:Decrypt"
+        ],
+        "Resource": "*"
+      },
+      {
+        "Sid": "Allow access for API Gateway",
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "apigateway.amazonaws.com"
+        },
+        "Action": "kms:Get*",
+        "Resource": "*"
+      }
+    ]
+  }
+EOF
 }
 
 # ------------------------------------------------------------------------------

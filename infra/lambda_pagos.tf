@@ -10,7 +10,7 @@ data "archive_file" "lambda_pagos_zip" {
 # 2. Grupo de Seguridad para la Lambda (permite tráfico HTTPS saliente)
 resource "aws_security_group" "lambda_pagos_sg" {
   name        = "lambda-pagos-sg"
-  description = "Permitir tráfico HTTPS saliente para la Lambda de Pagos"
+  description = "Allow outbound HTTPS traffic for the Pagos Lambda"
   vpc_id      = aws_vpc.main.id
 
   egress {
@@ -80,21 +80,6 @@ resource "aws_iam_role_policy_attachment" "lambda_pagos_dlq_attachment" {
   policy_arn = aws_iam_policy.lambda_pagos_dlq_policy.arn
 }
 
-# Code Signing for Lambda
-resource "aws_signer_signing_profile" "lambda_pagos_signing_profile" {
-  platform_id = "AWSLambda-SHA384-ECDSA"
-}
-
-resource "aws_lambda_code_signing_config" "lambda_pagos_csc" {
-  allowed_publishers {
-    signing_profile_version_arns = [aws_signer_signing_profile.lambda_pagos_signing_profile.arn]
-  }
-
-  policies {
-    untrusted_artifact_on_deployment = "Enforce"
-  }
-}
-
 # Dead Letter Queue (DLQ) for Lambda
 resource "aws_sqs_queue" "lambda_pagos_dlq" {
   name = "lambda-pagos-dlq"
@@ -112,8 +97,6 @@ resource "aws_lambda_function" "lambda_pagos" {
   filename         = data.archive_file.lambda_pagos_zip.output_path
   source_code_hash = data.archive_file.lambda_pagos_zip.output_base64sha256
   timeout          = 30
-
-  code_signing_config_arn = aws_lambda_code_signing_config.lambda_pagos_csc.arn
 
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_pagos_dlq.arn

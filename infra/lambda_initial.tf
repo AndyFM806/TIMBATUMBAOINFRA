@@ -64,26 +64,11 @@ resource "aws_iam_role_policy_attachment" "lambda_initial_dlq_attachment" {
 # Grupo de seguridad para la Lambda
 resource "aws_security_group" "lambda_initial_sg" {
   name        = "lambda-initial-sg"
-  description = "Grupo de seguridad para la Lambda initial"
+  description = "Security group for the initial Lambda"
   vpc_id      = aws_vpc.main.id
 
   tags = {
     Name = "lambda-initial-sg"
-  }
-}
-
-# Code Signing for Lambda
-resource "aws_signer_signing_profile" "lambda_initial_signing_profile" {
-  platform_id = "AWSLambda-SHA384-ECDSA"
-}
-
-resource "aws_lambda_code_signing_config" "lambda_initial_csc" {
-  allowed_publishers {
-    signing_profile_version_arns = [aws_signer_signing_profile.lambda_initial_signing_profile.arn]
-  }
-
-  policies {
-    untrusted_artifact_on_deployment = "Enforce"
   }
 }
 
@@ -103,8 +88,6 @@ resource "aws_lambda_function" "lambda_initial" {
 
   filename         = data.archive_file.lambda_initial_zip.output_path
   source_code_hash = data.archive_file.lambda_initial_zip.output_base64sha256
-
-  code_signing_config_arn = aws_lambda_code_signing_config.lambda_initial_csc.arn
 
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_initial_dlq.arn

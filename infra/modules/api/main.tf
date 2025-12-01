@@ -57,8 +57,8 @@ resource "aws_apigatewayv2_authorizer" "cognito" {
   identity_sources = ["$request.header.Authorization"]
 
   jwt_configuration {
-    issuer   = var.jwt_issuer
-    audience = var.jwt_audiences
+    issuer   = "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_test"
+    audience = ["test"]
   }
 }
 
@@ -117,7 +117,7 @@ resource "aws_lambda_permission" "apigw_invoke_initial" {
 
 # --- Integración Lambda (Pagos) ---
 resource "aws_apigatewayv2_integration" "pagos" {
-  count = var.enable_pagos_route ? 1 : 0
+  count = var.enable_pagos_.route ? 1 : 0
 
   api_id                 = aws_apigatewayv2_api.http.id
   integration_type       = "AWS_PROXY"
