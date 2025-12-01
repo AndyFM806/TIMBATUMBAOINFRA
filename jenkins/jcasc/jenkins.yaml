@@ -15,16 +15,16 @@ jenkins:
         templates:
           - labelString: "maven"
             connector:
-              $class: "io.jenkins.docker.connector.DockerComputerAttachConnector"
-              user: "root"
+              attach:
+                user: "root"
             dockerTemplateBase:
               image: "maven-agent"
             remoteFs: "/home/jenkins/agent"
 
           - labelString: "terraform"
             connector:
-              $class: "io.jenkins.docker.connector.DockerComputerAttachConnector"
-              user: "root"
+              attach:
+                user: "root"
             dockerTemplateBase:
               image: "terraform-agent"
             remoteFs: "/home/jenkins/agent"
