@@ -62,9 +62,9 @@ module "lambda_notificaciones" {
 module "api" {
   source = "./modules/api"
 
-  api_name          = "tapp-http-api-inscripciones"
-  lambda_invoke_arn = module.inscripciones_lambda.lambda_function_arn
-  stage_name        = "prod"
+  lambda_arn      = module.inscripciones_lambda.lambda_function_arn
+  kms_key_arn     = module.timbatumbao_resources.kms_key_arn
+  allowed_origins = ["*"]
 }
 
 module "timbatumbao_resources" {
