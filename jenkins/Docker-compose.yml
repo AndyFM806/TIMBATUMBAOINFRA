@@ -16,15 +16,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: jenkins-custom:latest # Le damos un nombre a la imagen de jenkins
+    image: jenkins-custom:latest
     container_name: jenkins-master
+    user: "root" # <-- ¡¡LA LÍNEA CLAVE!!
     ports:
       - "8080:8080"
       - "50000:50000"
     volumes:
       - jenkins_home:/var/jenkins_home
       - ./jcasc/jenkins.yaml:/var/jenkins_home/casc/jenkins.yaml:ro
-      - /var/run/docker.sock:/var/run/docker.sock # Montamos el socket de Docker
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
       - CASC_JENKINS_CONFIG=/var/jenkins_home/casc/jenkins.yaml
