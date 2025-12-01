@@ -16,8 +16,11 @@ data "aws_iam_policy_document" "kms_policy" {
       identifiers = ["logs.${var.aws_region}.amazonaws.com"]
     }
     actions = [
-      "kms:CreateLogGroup",
-      "kms:AssociateKmsKey"
+      "kms:Encrypt*",
+      "kms:Decrypt*",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
     ]
     resources = ["*"]
   }

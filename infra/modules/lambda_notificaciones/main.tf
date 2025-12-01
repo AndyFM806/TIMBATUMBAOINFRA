@@ -144,8 +144,6 @@ resource "aws_lambda_function" "this" {
     subnet_ids         = var.subnet_ids
     security_group_ids = [aws_security_group.lambda_sg.id]
   }
-
-  reserved_concurrent_executions = 10
   
   code_signing_config_arn = aws_lambda_code_signing_config.csc.arn
 
