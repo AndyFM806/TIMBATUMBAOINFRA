@@ -5,7 +5,7 @@ resource "aws_sns_topic" "notifications" {
 
 resource "aws_kms_key" "encryption_key" {
   description             = "KMS key for encrypting resources"
-  deletiopen_window_in_hours = 7
+  deletion_window_in_days = 7
 }
 
 resource "aws_sqs_queue" "inscripciones_queue" {
