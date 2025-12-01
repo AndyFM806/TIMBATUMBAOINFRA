@@ -19,7 +19,7 @@ jenkins:
           - labelString: "maven"
             connector:
               attach:
-                user: "root"
+                user: "jenkins"
             dockerTemplateBase:
               image: "maven-agent"
             remoteFs: "/home/jenkins/agent"
@@ -27,7 +27,7 @@ jenkins:
           - labelString: "terraform"
             connector:
               attach:
-                user: "root"
+                user: "jenkins"
             dockerTemplateBase:
               image: "terraform-agent"
             remoteFs: "/home/jenkins/agent"
