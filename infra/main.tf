@@ -63,4 +63,5 @@ module "inscripciones_lambda" {
 
       sns_notifications_topic_name = "timbatumbao-notifications"
       sqs_queue_name               = "timbatumbao-inscripciones-queue"
+      aws_region                   = var.aws_region
     }
