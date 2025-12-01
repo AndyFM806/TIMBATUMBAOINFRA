@@ -13,11 +13,13 @@ jenkins:
         dockerHost:
           uri: "unix:///var/run/docker.sock"
         templates:
-          - label: "maven"
-            image: "maven:3.9-eclipse-temurin-17"
+          - labelString: "maven"
+            dockerTemplateBase:
+              image: "maven:3.9-eclipse-temurin-17"
             remoteFs: "/home/jenkins/agent"
-          - label: "terraform"
-            image: "hashicorp/terraform:1.7"
+          - labelString: "terraform"
+            dockerTemplateBase:
+              image: "hashicorp/terraform:1.7"
             remoteFs: "/home/jenkins/agent"
 jobs:
   - script: >
