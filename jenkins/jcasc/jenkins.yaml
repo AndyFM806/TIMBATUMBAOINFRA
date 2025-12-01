@@ -16,10 +16,16 @@ jenkins:
             uri: "unix:///var/run/docker.sock"
         templates:
           - labelString: "maven"
+            connector:
+              $class: "io.jenkins.docker.connector.DockerComputerAttachConnector"
+              user: "jenkins"
             dockerTemplateBase:
               image: "maven:3.9-eclipse-temurin-17"
             remoteFs: "/home/jenkins/agent"
           - labelString: "terraform"
+            connector:
+              $class: "io.jenkins.docker.connector.DockerComputerAttachConnector"
+              user: "jenkins"
             dockerTemplateBase:
               image: "hashicorp/terraform:1.7"
             remoteFs: "/home/jenkins/agent"
