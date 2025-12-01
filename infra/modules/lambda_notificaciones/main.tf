@@ -117,8 +117,8 @@ resource "aws_lambda_function" "this" {
   handler       = var.lambda_handler
   runtime       = "java17"
 
-  filename         = local.jar_path_abs
-  source_code_hash = filebase64sha256(local.jar_path_abs)
+  filename         = "${path.module}/../inscripcionesLambda/java/target/inscripciones.jar"
+  source_code_hash = filebase64sha256("${path.module}/../inscripcionesLambda/java/target/inscripciones.jar")
 
   timeout     = 15
   memory_size = 512

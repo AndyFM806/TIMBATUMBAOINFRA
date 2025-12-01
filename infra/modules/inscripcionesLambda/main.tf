@@ -1,8 +1,3 @@
-locals {
-  # Ruta absoluta al JAR enviada desde el root
-  jar_path_abs = abspath(var.jar_path)
-}
-
 data "aws_caller_identity" "current" {}
 
 # ---------------------------------------------------------------------
@@ -148,8 +143,8 @@ resource "aws_lambda_function" "inscripciones" {
   handler       = var.lambda_handler
   runtime       = "java17"
 
-  filename         = local.jar_path_abs
-  source_code_hash = filebase64sha256(local.jar_path_abs)
+  filename         = "${path.module}/java/target/inscripciones.jar"
+  source_code_hash = filebase64sha256("${path.module}/java/target/inscripciones.jar")
 
   timeout     = 15
   memory_size = 512
