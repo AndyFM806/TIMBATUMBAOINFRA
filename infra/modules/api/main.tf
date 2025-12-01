@@ -49,27 +49,11 @@ resource "aws_apigatewayv2_integration" "inscripciones" {
   payload_format_version = "2.0"
 }
 
-# Authorizer Cognito (ahora es obligatorio)
-resource "aws_apigatewayv2_authorizer" "cognito" {
-  api_id           = aws_apigatewayv2_api.http.id
-  name             = "cognito-authorizer"
-  authorizer_type  = "JWT"
-  identity_sources = ["$request.header.Authorization"]
-
-  jwt_configuration {
-    issuer   = "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_test"
-    audience = ["test"]
-  }
-}
-
 # Ruta /inscripciones
 resource "aws_apigatewayv2_route" "inscripciones" {
   api_id    = aws_apigatewayv2_api.http.id
   route_key = "POST /inscripciones"
   target    = "integrations/${aws_apigatewayv2_integration.inscripciones.id}"
-
-  authorization_type = "JWT"
-  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
 
 # Permiso APIGW -> Lambda (Inscripciones) - Más seguro
@@ -99,9 +83,6 @@ resource "aws_apigatewayv2_route" "initial" {
   api_id    = aws_apigatewayv2_api.http.id
   route_key = "GET /initial"
   target    = "integrations/${aws_apigatewayv2_integration.initial[0].id}"
-  
-  authorization_type = "JWT"
-  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
 
 # Permiso APIGW -> Lambda (Initial)
@@ -133,9 +114,6 @@ resource "aws_apigatewayv2_route" "pagos" {
   api_id    = aws_apigatewayv2_api.http.id
   route_key = "POST /pagos"
   target    = "integrations/${aws_apigatewayv2_integration.pagos[0].id}"
-
-  authorization_type = "JWT"
-  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
 
 # Permiso APIGW -> Lambda (Pagos)
@@ -146,5 +124,5 @@ resource "aws_lambda_permission" "apigw_invoke_pagos" {
   action        = "lambda:InvokeFunction"
   principal     = "apigateway.amazonaws.com"
   function_name = var.lambda_pagos_arn
-  source_arn    = "${aws_apigatewayv2_api.http.execution_arn}/*/${aws_apigatewayv2_route.pagos[0].route_key}"
+  source_-arn    = "${aws_apigatewayv2_api.http.execution_arn}/*/${aws_apigatewayv2_route.pagos[0].route_key}"
 }

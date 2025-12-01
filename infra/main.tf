@@ -70,6 +70,21 @@ resource "aws_kms_key" "encryption_key" {
         },
         "Action": "kms:Get*",
         "Resource": "*"
+      },
+      {
+        "Sid": "Allow VPC Flow Logs to use the key",
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "delivery.logs.amazonaws.com"
+        },
+        "Action": [
+            "kms:Encrypt",
+            "kms:Decrypt",
+            "kms:ReEncrypt*",
+            "kms:GenerateDataKey*",
+            "kms:DescribeKey"
+        ],
+        "Resource": "*"
       }
     ]
   }

@@ -102,8 +102,6 @@ resource "aws_lambda_function" "lambda_initial" {
     security_group_ids = [aws_security_group.lambda_initial_sg.id]
   }
 
-  reserved_concurrent_executions = 10
-
   tags = {
     Name = "LambdaInitial"
   }

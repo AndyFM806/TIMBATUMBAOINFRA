@@ -111,8 +111,6 @@ resource "aws_lambda_function" "lambda_pagos" {
     security_group_ids = [aws_security_group.lambda_pagos_sg.id]
   }
 
-  reserved_concurrent_executions = 10
-
   tags = {
     Name = "LambdaPagos"
   }
