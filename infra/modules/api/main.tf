@@ -124,5 +124,5 @@ resource "aws_lambda_permission" "apigw_invoke_pagos" {
   action        = "lambda:InvokeFunction"
   principal     = "apigateway.amazonaws.com"
   function_name = var.lambda_pagos_arn
-  source_-arn    = "${aws_apigatewayv2_api.http.execution_arn}/*/${aws_apigatewayv2_route.pagos[0].route_key}"
+  source_arn    = "${aws_apigatewayv2_api.http.execution_arn}/*/${aws_apigatewayv2_route.pagos[0].route_key}"
 }

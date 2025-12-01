@@ -57,3 +57,27 @@ variable "jwt_audiences" {
   type        = list(string)
   default     = []
 }
+
+variable "lambda_function_name" {
+  description = "The name of the Lambda function."
+  type        = string
+  default     = ""
+}
+
+variable "jar_path" {
+  description = "The path to the JAR file."
+  type        = string
+  default     = ""
+}
+
+variable "handler" {
+  description = "The handler for the Lambda function."
+  type        = string
+  default     = ""
+}
+
+variable "runtime" {
+  description = "The runtime for the Lambda function."
+  type        = string
+  default     = ""
+}
