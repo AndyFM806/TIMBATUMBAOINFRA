@@ -4,11 +4,29 @@
 resource "aws_kms_key" "initial_lambda_env_key" {
   description             = "KMS key for encrypting Lambda environment variables for initial_lambda"
   deletion_window_in_days = 7
+  enable_key_rotation   = true
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Id      = "kms-key-policy",
+    Statement = [
+      {
+        Sid    = "Enable IAM User Permissions",
+        Effect = "Allow",
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        Action   = "kms:*",
+        Resource = "*"
+      }
+    ]
+  })
 }
 
 # Dead Letter Queue for the Lambda
 resource "aws_sqs_queue" "initial_lambda_dlq" {
   name = "initial-lambda-dlq"
+  sqs_managed_sse_enabled = true
 }
 
 # Security Group for the Lambda
@@ -77,3 +95,5 @@ resource "aws_lambda_function" "initial_lambda" {
     Environment = var.stage
   }
 }
+
+data "aws_caller_identity" "current" {}

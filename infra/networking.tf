@@ -10,6 +10,7 @@ resource "aws_vpc" "main" {
 }
 
 # Subred Pública: Para recursos con acceso a Internet (ej. NAT Gateway)
+# checkov:skip=CKV_AWS_130:Public subnets are intended to have public IPs
 resource "aws_subnet" "public" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.0.1.0/24"
@@ -45,7 +46,7 @@ resource "aws_internet_gateway" "main" {
 # Elastic IP: IP pública fija para la NAT Gateway
 resource "aws_eip" "nat" {
   domain = "vpc"
-  
+
   tags = {
     Name = "tapp-nat-eip"
   }
@@ -104,4 +105,48 @@ resource "aws_route_table_association" "public" {
 resource "aws_route_table_association" "private" {
   subnet_id      = aws_subnet.private.id
   route_table_id = aws_route_table.private.id
+}
+
+# --- Default Security Group: Restrict all traffic by default ---
+resource "aws_default_security_group" "default" {
+  vpc_id = aws_vpc.main.id
+
+  ingress = []
+  egress  = []
+
+  tags = {
+    Name = "tapp-default-sg"
+  }
+}
+
+# --- VPC Flow Logs ---
+resource "aws_cloudwatch_log_group" "flow_logs" {
+  name = "tapp-vpc-flow-logs"
+}
+
+resource "aws_iam_role" "flow_logs_role" {
+  name = "tapp-flow-logs-role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "vpc-flow-logs.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_flow_log" "main" {
+  iam_role_arn    = aws_iam_role.flow_logs_role.arn
+  log_destination = aws_cloudwatch_log_group.flow_logs.arn
+  traffic_type    = "ALL"
+  vpc_id          = aws_vpc.main.id
 }
