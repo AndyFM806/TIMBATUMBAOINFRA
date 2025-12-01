@@ -22,3 +22,8 @@ output "timbatumbao_notifications_topic_arn" {
   description = "ARN of the SNS notifications topic"
   value       = aws_sns_topic.timbatumbao_notifications.arn
 }
+
+output "timbatumbao_notifications_topic_name" {
+  description = "Name of the SNS notifications topic"
+  value       = aws_sns_topic.timbatumbao_notifications.name
+}
