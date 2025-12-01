@@ -5,5 +5,5 @@ output "api_gateway_url" {
 
 output "timbatumbao_table_name" {
     description = "The name of the DynamoDB table."
-    value       = module.core_resources.timbatumbao_table_name
+    value       = aws_dynamodb_table.inscripciones_table.name
 }

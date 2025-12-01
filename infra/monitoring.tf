@@ -94,8 +94,8 @@ resource "aws_cloudwatch_dashboard" "main_dashboard" {
         height = 6,
         properties = {
           metrics = [
-            ["AWS/DynamoDB", "ConsumedReadCapacityUnits", "TableName", module.core_resources.timbatumbao_table_name, { "stat" = "Sum" }],
-            ["AWS/DynamoDB", "ConsumedWriteCapacityUnits", "TableName", module.core_resources.timbatumbao_table_name, { "stat" = "Sum" }]
+            ["AWS/DynamoDB", "ConsumedReadCapacityUnits", "TableName", aws_dynamodb_table.inscripciones_table.name, { "stat" = "Sum" }],
+            ["AWS/DynamoDB", "ConsumedWriteCapacityUnits", "TableName", aws_dynamodb_table.inscripciones_table.name, { "stat" = "Sum" }]
           ],
           view   = "timeSeries",
           region = var.aws_region,
