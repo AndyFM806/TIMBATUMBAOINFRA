@@ -32,3 +32,18 @@ variable "sns_topic_arn" {
   description = "ARN del topic SNS donde publicará la Lambda de inscripciones."
   type        = string
 }
+
+variable "kms_key_arn" {
+  description = "ARN de la clave KMS para el cifrado."
+  type        = string
+}
+
+variable "vpc_id" {
+  description = "ID de la VPC para el grupo de seguridad."
+  type        = string
+}
+
+variable "subnet_ids" {
+  description = "Lista de IDs de subred para la configuración de la VPC de la Lambda."
+  type        = list(string)
+}

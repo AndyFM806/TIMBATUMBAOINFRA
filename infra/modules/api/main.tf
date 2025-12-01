@@ -13,7 +13,8 @@ resource "aws_apigatewayv2_api" "http" {
 # CloudWatch Log Group for Access Logs
 resource "aws_cloudwatch_log_group" "api_gateway_access_logs" {
   name              = "/aws/apigateway/${aws_apigatewayv2_api.http.name}/prod"
-  retention_in_days = 30
+  retention_in_days = 365
+  kms_key_id        = var.kms_key_arn
 }
 
 # Stage

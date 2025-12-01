@@ -38,3 +38,8 @@ variable "jwt_audiences" {
   type        = list(string)
   default     = []
 }
+
+variable "kms_key_arn" {
+  description = "ARN de la clave KMS para cifrar los logs de CloudWatch"
+  type        = string
+}

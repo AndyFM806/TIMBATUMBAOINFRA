@@ -90,6 +90,8 @@ resource "aws_lambda_code_signing_config" "lambda_notificaciones_csc" {
 # Dead Letter Queue (DLQ) for Lambda
 resource "aws_sqs_queue" "lambda_notificaciones_dlq" {
   name = "lambda-notificaciones-dlq"
+  kms_master_key_id = aws_kms_key.dynamodb.arn
+  kms_data_key_reuse_period_seconds = 300
 }
 
 # 4. Crear la Función Lambda en AWS

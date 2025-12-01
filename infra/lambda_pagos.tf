@@ -98,6 +98,8 @@ resource "aws_lambda_code_signing_config" "lambda_pagos_csc" {
 # Dead Letter Queue (DLQ) for Lambda
 resource "aws_sqs_queue" "lambda_pagos_dlq" {
   name = "lambda-pagos-dlq"
+  kms_master_key_id = aws_kms_key.dynamodb.arn
+  kms_data_key_reuse_period_seconds = 300
 }
 
 # 6. Crear la Función Lambda en AWS

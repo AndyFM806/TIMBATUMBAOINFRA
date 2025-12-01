@@ -10,6 +10,9 @@ module "inscripciones_lambda" {
   stage                = var.stage
   jar_path             = var.jar_path
   sns_topic_arn        = aws_sns_topic.payment_notifications.arn
+  kms_key_arn          = aws_kms_key.dynamodb.arn
+  vpc_id               = aws_vpc.main.id
+  subnet_ids           = [aws_subnet.private.id]
 }
 
 module "api" {
@@ -24,4 +27,5 @@ module "api" {
   enable_cognito_auth = true # <-- Encendemos la autenticación
   jwt_issuer          = aws_cognito_user_pool.user_pool.endpoint
   jwt_audiences       = [aws_cognito_user_pool_client.user_pool_client.id]
+  kms_key_arn         = aws_kms_key.dynamodb.arn
 }
