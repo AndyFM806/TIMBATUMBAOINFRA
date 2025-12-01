@@ -69,6 +69,5 @@ module "api" {
 module "timbatumbao_resources" {
   source = "./modules/timbatumbao_resources"
 
-  aws_region  = var.aws_region
-  environment = "dev"
+  sns_notifications_topic_name = "timbatumbao-notifications"
 }
