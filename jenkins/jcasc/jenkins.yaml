@@ -17,33 +17,25 @@ jenkins:
         templates:
           - labelString: "maven"
             connector:
-              $class: "io.jenkins.docker.connector.DockerComputerAttachConnector"
-              user: "jenkins"
+              $class: "io.jenkins.docker.connector.DockerComputerSSHConnector"
+              sshKeyStrategy: "sshKeyPath"
             dockerTemplateBase:
               image: "maven:3.9-eclipse-temurin-17"
             remoteFs: "/home/jenkins/agent"
           - labelString: "terraform"
             connector:
-              $class: "io.jenkins.docker.connector.DockerComputerAttachConnector"
-              user: "jenkins"
+              $class: "io.jenkins.docker.connector.DockerComputerSSHConnector"
+              sshKeyStrategy: "sshKeyPath"
             dockerTemplateBase:
               image: "hashicorp/terraform:1.7"
             remoteFs: "/home/jenkins/agent"
 jobs:
   - script: >
       pipelineJob('timbatumbao-ci-cd') {
-        description('Pipeline de CI/CD para el proyecto Timbatumbao.')
         definition {
-          cpsScm {
-            scm {
-              git {
-                remote {
-                  url('https://github.com/AndyFM806/TIMBATUMBAOINFRA.git')
-                }
-                branch('main')
-              }
-            }
-            scriptPath('Jenkinsfile')
+          cps {
+            script(readFileFromWorkspace('pipelines/Jenkinsfile'))
+            sandbox()
           }
         }
       }
