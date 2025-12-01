@@ -18,5 +18,3 @@ resource "aws_dynamodb_table" "inscripciones_table" {
     Service     = "Inscripciones"
   }
 }
-
-data "aws_caller_identity" "current" {}
