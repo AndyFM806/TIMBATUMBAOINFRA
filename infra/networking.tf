@@ -1,3 +1,4 @@
+data "aws_region" "current" {}
 
 # infra/networking.tf
 
