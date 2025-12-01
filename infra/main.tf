@@ -74,6 +74,7 @@ module "notifier" {
 module "api" {
   source = "./modules/api"
 
-  api_name          = "TappInscripcionesAPI"
-  lambda_invoke_arn = module.enrollment_handler.arn
+  lambda_arn      = module.enrollment_handler.arn
+  kms_key_arn     = aws_kms_key.encryption_key.arn
+  allowed_origins = ["*"]
 }
