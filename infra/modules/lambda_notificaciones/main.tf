@@ -117,8 +117,8 @@ resource "aws_lambda_function" "this" {
   handler       = var.lambda_handler
   runtime       = "java17"
 
-  filename         = "${path.module}/../inscripcionesLambda/java/target/inscripciones.jar"
-  source_code_hash = filebase64sha256("${path.module}/../inscripcionesLambda/java/target/inscripciones.jar")
+  filename         = "${path.module}/../inscripcionesLambda/target/inscripciones.jar"
+  source_code_hash = filebase64sha256("${path.module}/../inscripcionesLambda/target/inscripciones.jar")
 
   timeout     = 15
   memory_size = 512
@@ -144,8 +144,8 @@ resource "aws_lambda_function" "this" {
     subnet_ids         = var.subnet_ids
     security_group_ids = [aws_security_group.lambda_sg.id]
   }
-  
-  code_signing_config_arn = aws_lambda_code_signing_config.csc.arn
+  code_signing_config_arn = null
+  #code_signing_config_arn = aws_lambda_code_signing_config.csc.arn
 
   tags = {
     Service     = var.lambda_function_name

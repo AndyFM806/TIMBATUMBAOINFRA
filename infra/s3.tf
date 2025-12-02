@@ -1,8 +1,8 @@
 resource "aws_s3_bucket" "frontend_bucket" {
-  bucket = "timbatumbao-frontend-bucket"
+  bucket = var.bucket_name
 
   tags = {
-    Name        = "timbatumbao-frontend-bucket"
+    Name        = var.bucket_name
     Environment = var.stage
     Service     = "Frontend"
   }

@@ -82,3 +82,7 @@ variable "runtime" {
   type        = string
   default     = ""
 }
+
+variable "bucket_name" {
+  type = string
+}

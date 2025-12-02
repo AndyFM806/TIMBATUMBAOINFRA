@@ -41,7 +41,7 @@ module "inscripciones_lambda" {
 
     lambda_function_name = "Notifier"
       lambda_handler       = "com.academiabaile.backend.handlers.NotificationHandler"
-      jar_path             = "./modules/inscripcionesLambda/java/target/inscripciones.jar"
+      jar_path             = "./modules/inscripcionesLambda/target/inscripciones.jar"
       stage                = "prod"
       aws_region           = var.aws_region
       sns_topic_arn        = module.timbatumbao_resources.sns_topic_arn
