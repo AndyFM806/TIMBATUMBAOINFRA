@@ -1,7 +1,5 @@
-# No usamos 'version' porque está obsoleto.
-
 services:
-  # ----- CONSTRUCCIÓN DE AGENTES (esto no cambia) -----
+  # ----- CONSTRUCCIÓN DE AGENTES -----
   terraform-agent:
     image: custom-agent/terraform
     build:
@@ -22,12 +20,11 @@ services:
     build:
       context: ./agents/docker
 
-  # ----- CONTROLADOR DE JENKINS (aquí está la corrección) -----
+  # ----- CONTROLADOR DE JENKINS -----
   jenkins-controller:
-    # En lugar de 'image', usamos 'build' para que use nuestro Dockerfile
     build:
-      context: .  # El '.' significa 'este mismo directorio', es decir, la carpeta 'jenkins'
-      dockerfile: Dockerfile # Le decimos explícitamente que use tu archivo Dockerfile
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
       - "50000:50000"
@@ -35,28 +32,26 @@ services:
       - ./jcasc:/var/jenkins_home/casc_configs
       - jenkins-data:/var/jenkins_home
     environment:
-      # Pasamos las credenciales de AWS que exportaste en tu terminal
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     depends_on:
-      # Le decimos que espere a que los otros servicios estén listos
-      - terraform-agent
-      - node-agent
-      - maven-agent
-      - docker-agent
-      - dind
+      dind:
+        # ¡IMPORTANTE! Ahora espera a que dind esté saludable
+        condition: service_healthy
 
-  # ----- DOCKER-IN-DOCKER (esto no cambia) -----
+  # ----- DOCKER-IN-DOCKER (con correcciones) -----
   dind:
     image: docker:24.0-dind
     privileged: true
-    volumes:
-      - jenkins-docker-certs:/certs/client
-    ports:
-      - "2375:2375"
-    environment:
-      - DOCKER_TLS_CERTDIR=/certs
+    # No necesitamos exponer el puerto al host, solo a otros contenedores
+    expose:
+      - "2375"
+    # ¡IMPORTANTE! Añadimos una prueba de salud
+    healthcheck:
+      test: ["CMD", "docker", "info"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   jenkins-data:
-  jenkins-docker-certs:
