@@ -78,7 +78,7 @@ jobs:
               }
             }
             // Ruta del Jenkinsfile dentro del repo
-            scriptPath('jenkins/pipelines/Jenkinsfile')
+            scriptPath('pipelines/Jenkinsfile')
           }
         }
       }
