@@ -1,68 +1,86 @@
 jenkins:
-  systemMessage: "Jenkins configurado con acceso directo admin/admin"
+  systemMessage: "Jenkins a medida para TimbaTumbao ✨"
   securityRealm:
     local:
       allowsSignup: false
       users:
         - id: "admin"
           password: "admin"
-
   authorizationStrategy:
     loggedInUsersCanDoAnything:
       allowAnonymousRead: false
-
-  disableRememberMe: false
-
   clouds:
     - docker:
-        name: "dind-cloud"
+        name: "docker"
         dockerApi:
           dockerHost:
-            uri: "tcp://172.18.0.1:2375"
-
+            uri: "tcp://dind:2375" # Se conecta al servicio dind del docker-compose
         templates:
-
-          # Agente genérico para docker
-          - name: "docker-agent"
-            labelString: "docker"
-            remoteFs: "/home/jenkins"
-            instanceCapStr: "5"
-            dockerTemplateBase:
-              image: "jenkins/inbound-agent:alpine-jdk21"
-              tty: true
-            retentionStrategy:
-              idleMinutes: 10
-            connector:
-              attach:
-                user: "jenkins"
-
-          # Agente genérico para terraform
+          # === Agente Terraform AWSCLI Checkov ===
           - name: "terraform-agent"
             labelString: "terraform"
             remoteFs: "/home/jenkins"
-            instanceCapStr: "5"
+            instanceCapStr: 3
             dockerTemplateBase:
-              image: "jenkins/inbound-agent:alpine-jdk21"
-              tty: true
-            retentionStrategy:
-              idleMinutes: 10
-            connector:
-              attach:
-                user: "jenkins"
-
-          # Agente genérico para Node (igual base, luego puedes hacer imagen custom)
-          - name: "node-agent"
-            labelString: "node"
-            remoteFs: "/home/jenkins"
-            instanceCapStr: "3"
-            dockerTemplateBase:
-              image: "jenkins/inbound-agent:alpine-jdk21"
+              image: "custom-agent/terraform" # <-- ¡Usando nuestra imagen local!
               tty: true
             retentionStrategy:
               idleMinutes: 5
             connector:
               attach:
                 user: "jenkins"
+          
+          # === Agente NodeJS ===
+          - name: "node-agent"
+            labelString: "node"
+            remoteFs: "/home/jenkins"
+            instanceCapStr: 3
+            dockerTemplateBase:
+              image: "custom-agent/node" # <-- ¡Usando nuestra imagen local!
+              tty: true
+            retentionStrategy:
+              idleMinutes: 5
+            connector:
+              attach:
+                user: "jenkins"
+
+          # === Agente Maven (Java) ===
+          - name: "maven-agent"
+            labelString: "maven"
+            remoteFs: "/home/jenkins"
+            instanceCapStr: 2
+            dockerTemplateBase:
+              image: "custom-agent/maven" # <-- ¡Usando nuestra imagen local!
+              tty: true
+            retentionStrategy:
+              idleMinutes: 5
+            connector:
+              attach:
+                user: "jenkins"
+                
+          # === Agente Docker CLI ===
+          - name: "docker-agent"
+            labelString: "docker"
+            remoteFs: "/home/jenkins"
+            instanceCapStr: 5
+            dockerTemplateBase:
+              image: "custom-agent/docker" # <-- ¡Usando nuestra imagen local!
+              tty: true
+            retentionStrategy:
+              idleMinutes: 10
+            connector:
+              attach:
+                user: "jenkins"
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - usernamePassword:
+              scope: GLOBAL
+              id: "aws-credentials-00" # <-- ID EXACTO que usa tu Jenkinsfile
+              username: "${AWS_ACCESS_KEY_ID}"
+              password: "${AWS_SECRET_ACCESS_KEY}"
 
 jobs:
   - script: >
@@ -77,9 +95,7 @@ jobs:
                 branches('*/main')
               }
             }
-            // Ruta del Jenkinsfile dentro del repo
             scriptPath('pipelines/Jenkinsfile')
           }
         }
       }
-

@@ -1,45 +1,62 @@
-version: "3.8"
+# No usamos 'version' porque está obsoleto.
 
 services:
-  jenkins:
+  # ----- CONSTRUCCIÓN DE AGENTES (esto no cambia) -----
+  terraform-agent:
+    image: custom-agent/terraform
     build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: jenkins-master
-    environment:
-      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
-      - CASC_JENKINS_CONFIG=/var/jenkins_home/casc/jenkins.yaml
+      context: ./agents/terraform
+
+  node-agent:
+    image: custom-agent/node
+    build:
+      context: ./agents/node
+
+  maven-agent:
+    image: custom-agent/maven
+    build:
+      context: ./agents/maven
+
+  docker-agent:
+    image: custom-agent/docker
+    build:
+      context: ./agents/docker
+
+  # ----- CONTROLADOR DE JENKINS (aquí está la corrección) -----
+  jenkins-controller:
+    # En lugar de 'image', usamos 'build' para que use nuestro Dockerfile
+    build:
+      context: .  # El '.' significa 'este mismo directorio', es decir, la carpeta 'jenkins'
+      dockerfile: Dockerfile # Le decimos explícitamente que use tu archivo Dockerfile
     ports:
       - "8080:8080"
       - "50000:50000"
     volumes:
-      - jenkins_home:/var/jenkins_home
-      - ./jcasc/jenkins.yaml:/var/jenkins_home/casc/jenkins.yaml:ro
-    depends_on:
-      - docker-dind
-    network_mode: bridge
-    # networks:
-    #   - jenkins-net
-
-  docker-dind:
-    image: docker:27-dind
-    container_name: docker-dind
-    privileged: true
+      - ./jcasc:/var/jenkins_home/casc_configs
+      - jenkins-data:/var/jenkins_home
     environment:
-      - DOCKER_TLS_CERTDIR=
-    command: ["dockerd", "--host=tcp://0.0.0.0:2375", "--tls=false"]
+      # Pasamos las credenciales de AWS que exportaste en tu terminal
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    depends_on:
+      # Le decimos que espere a que los otros servicios estén listos
+      - terraform-agent
+      - node-agent
+      - maven-agent
+      - docker-agent
+      - dind
+
+  # ----- DOCKER-IN-DOCKER (esto no cambia) -----
+  dind:
+    image: docker:24.0-dind
+    privileged: true
+    volumes:
+      - jenkins-docker-certs:/certs/client
     ports:
       - "2375:2375"
-    volumes:
-      - dind_storage:/var/lib/docker
-    network_mode: bridge
-    # networks:
-    #   - jenkins-net
+    environment:
+      - DOCKER_TLS_CERTDIR=/certs
 
 volumes:
-  jenkins_home:
-  dind_storage:
-
-# networks:
-#   jenkins-net:
-#     driver: bridge
+  jenkins-data:
+  jenkins-docker-certs:

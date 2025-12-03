@@ -9,7 +9,7 @@ COPY plugins.txt /usr/share/jenkins/plugins.txt
 RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/plugins.txt
 
 # JCasC leerá este archivo (montado por docker-compose)
-ENV CASC_JENKINS_CONFIG=/var/jenkins_home/casc/jenkins.yaml
+ENV CASC_JENKINS_CONFIG=/var/jenkins_home/casc_configs/jenkins.yaml
 
 USER jenkins
 
