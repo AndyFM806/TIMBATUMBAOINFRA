@@ -1,5 +1,4 @@
-configuration-as-code
-configuration-as-code-support
+configuration-as-code:2006.v001a_2ca_6b_574
 
 git
 workflow-aggregator
@@ -7,7 +6,7 @@ credentials-binding
 ssh-agent
 
 docker-workflow
-docker-plugin
-job-dsl
-junit
+docker-plugin:1308.vff6e33248305
+job-dsl:1.93
+junit:1380.v491ff054cd35
 pipeline-utility-steps

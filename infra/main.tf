@@ -24,7 +24,7 @@ module "inscripciones_lambda" {
     source = "./modules/lambda_processor"
 
     lambda_function_name = "PaymentProcessor"
-    lambda_handler       = "com.academiabaile.backend.handlers.PaymentHandler"
+    lambda_handler       = "com.academiabaile.backend.handlers.InscripcionHandler::handleRequest"
     jar_path             = "./modules/inscripcionesLambda/java/target/inscripciones.jar"
     stage                = "prod"
     aws_region           = var.aws_region
@@ -40,7 +40,7 @@ module "inscripciones_lambda" {
     source = "./modules/lambda_notificaciones"
 
     lambda_function_name = "Notifier"
-      lambda_handler       = "com.academiabaile.backend.handlers.NotificationHandler"
+      lambda_handler       = "com.academiabaile.backend.handlers.InscripcionHandler::handleRequest"
       jar_path             = "./modules/inscripcionesLambda/target/inscripciones.jar"
       stage                = "prod"
       aws_region           = var.aws_region

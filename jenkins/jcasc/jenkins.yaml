@@ -18,7 +18,7 @@ jenkins:
         name: "dind-cloud"
         dockerApi:
           dockerHost:
-            uri: "tcp://docker-dind:2375"
+            uri: "tcp://172.18.0.1:2375"
 
         templates:
 
@@ -78,7 +78,7 @@ jobs:
               }
             }
             // Ruta del Jenkinsfile dentro del repo
-            scriptPath('jenkins/Jenkinsfile')  // o 'Jenkinsfile' si está en la raíz
+            scriptPath('jenkins/pipelines/Jenkinsfile')
           }
         }
       }

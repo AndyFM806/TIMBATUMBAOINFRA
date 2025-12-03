@@ -17,8 +17,9 @@ services:
       - ./jcasc/jenkins.yaml:/var/jenkins_home/casc/jenkins.yaml:ro
     depends_on:
       - docker-dind
-    networks:
-      - jenkins-net
+    network_mode: bridge
+    # networks:
+    #   - jenkins-net
 
   docker-dind:
     image: docker:27-dind
@@ -31,13 +32,14 @@ services:
       - "2375:2375"
     volumes:
       - dind_storage:/var/lib/docker
-    networks:
-      - jenkins-net
+    network_mode: bridge
+    # networks:
+    #   - jenkins-net
 
 volumes:
   jenkins_home:
   dind_storage:
 
-networks:
-  jenkins-net:
-    driver: bridge
+# networks:
+#   jenkins-net:
+#     driver: bridge

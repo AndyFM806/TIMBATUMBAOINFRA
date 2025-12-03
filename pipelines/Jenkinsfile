@@ -83,8 +83,7 @@ pipeline {
 
                             echo "[TF] Plan usando terraform.tfvars..."
                             terraform plan \
-                              -input=false \
-                              -var-file=terraform.tfvars \
+                              -var-file=dev.tfvars \
                               -out=tfplan
                         '''
                     }
@@ -115,7 +114,7 @@ pipeline {
                     dir('infra') {
                         sh '''
                             echo "[TF] Aplicando plan tfplan..."
-                            terraform apply -input=false -auto-approve tfplan
+                            terraform apply -auto-approve tfplan 
                         '''
                     }
                 }
