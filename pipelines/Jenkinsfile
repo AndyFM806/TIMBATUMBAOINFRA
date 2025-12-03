@@ -7,39 +7,112 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
-            agent { label 'terraform' } // Puede ser cualquier agente con git
+            agent { label 'terraform' }
             steps {
                 checkout scm
             }
         }
 
-        stage('Build Backend (Java)') {
-            agent { label 'maven' } // <-- Usando el nuevo agente Maven
+        stage('1. Linting y validación Terraform') {
+            agent { label 'terraform' }
             steps {
-                dir('App/backend/academia-baile-backend') {
-                    sh 'mvn clean package -DskipTests' // Compila y empaqueta el JAR
+                dir('infra') {
+                    sh '''
+                        echo "[TF] Formateando y validando..."
+                        terraform fmt -check
+                        terraform validate
+                    '''
                 }
             }
         }
-        
-        // ... Tus etapas existentes ...
 
-        stage('1. Linting y validación Terraform') { ... }
         stage('2. Checkov (seguridad IaC)') {
-             agent { label 'docker' } // Usando el agente Docker dedicado
-             steps {
+            agent { label 'docker' }
+            steps {
                 dir('infra') {
                     sh '''
-                       docker run --rm -v "$PWD:/tf" bridgecrew/checkov:latest -d /tf
+                        echo "[Checkov] Escaneando IaC..."
+                        docker run --rm -v "$PWD":/tf --workdir /tf bridgecrew/checkov:latest -d /tf -o junitxml --output-file-path results.xml
+                    '''
+                    junit 'results.xml'
+                }
+            }
+        }
+
+        stage('3. Test unitarios (Node)') {
+            agent { label 'node' }
+            steps {
+                dir('App/frontend') {
+                    sh '''
+                        npm install
+                        npm test -- --unit
                     '''
                 }
-             }
+            }
         }
-        stage('3. Test unitarios (Node)') { ... }
-        stage('4. Terraform Plan (preview)') { ... }
-        stage('5. Aprobación manual') { ... }
-        stage('6. Terraform Apply') { ... }
+
+        stage('4. Terraform Plan (preview)') {
+            agent { label 'terraform' }
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'aws-credentials-00',
+                        usernameVariable: 'AWS_ACCESS_KEY_ID',
+                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                    )
+                ]) {
+                    dir('infra') {
+                        sh '''
+                            echo "[TF] Init..."
+                            terraform init -input=false
+
+                            echo "[TF] Plan usando terraform.tfvars..."
+                            terraform plan -var-file=dev.tfvars -out=tfplan
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('5. Aprobación manual') {
+            agent none
+            when { branch 'main' } // <-- BIEN: El 'when' está dentro del 'stage'
+            steps {
+                input message: '¿Aplicar cambios de Terraform en AWS con este plan?',
+                      ok: 'Aplicar IaC'
+            }
+        }
+
+        stage('6. Terraform Apply') {
+            agent { label 'terraform' }
+            when { branch 'main' } // <-- BIEN: El 'when' está dentro del 'stage'
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'aws-credentials-00',
+                        usernameVariable: 'AWS_ACCESS_KEY_ID',
+                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                    )
+                ]) {
+                    dir('infra') {
+                        sh '''
+                            echo "[TF] Aplicando plan tfplan..."
+                            terraform apply -auto-approve tfplan
+                        '''
+                    }
+                }
+            }
+        }
     }
-    post { ... }
+
+    post {
+        success {
+            echo 'Despliegue de infraestructura (IaC) completado exitosamente.'
+        }
+        failure {
+            echo 'Error en el pipeline. Revisa la etapa fallida en Jenkins.'
+        }
+    }
 }
