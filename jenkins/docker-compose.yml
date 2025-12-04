@@ -1,7 +1,11 @@
 version: '3.8'
 services:
+<<<<<<< HEAD
   # ----- CONSTRUCCIÓN Y EJECUCIÓN DE AGENTES -----
 
+=======
+  # ----- IMAGE BUILDS -----
+>>>>>>> fe30db21244edb790e6b2e02bbbf0be2622b51a6
   terraform-agent:
     image: custom-agent/terraform
     environment:
@@ -36,6 +40,10 @@ services:
       jenkins-controller:
         condition: service_started
 
+<<<<<<< HEAD
+=======
+  # ----- JENKINS CONTROLLER -----
+>>>>>>> fe30db21244edb790e6b2e02bbbf0be2622b51a6
   jenkins-controller:
     build:
       context: .
@@ -51,6 +59,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     depends_on:
       dind:
+<<<<<<< HEAD
         condition: service_healthy 
       image-builder:
         condition: service_completed_successfully
@@ -69,12 +78,26 @@ services:
     restart: "no"
 
   # DOCKER-IN-DOCKER (DinD): Servidor Docker.
+=======
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/login"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  # ----- DOCKER-IN-DOCKER (with healthcheck) -----
+>>>>>>> fe30db21244edb790e6b2e02bbbf0be2622b51a6
   dind:
     image: docker:24.0-dind
     command: --host=tcp://0.0.0.0:2375
     privileged: true
     expose:
+<<<<<<< HEAD
       - "2375" # Puerto para conexión TCP
+=======
+      - "2375"
+>>>>>>> fe30db21244edb790e6b2e02bbbf0be2622b51a6
     healthcheck:
       test: ["CMD", "docker", "info"]
       interval: 10s
@@ -86,5 +109,9 @@ services:
       - ./agents:/build-agents
 
 volumes:
+<<<<<<< HEAD
   jenkins-data:
   dind-data: # 🚨 NUEVA DEFINICIÓN: Volumen con nombre para el almacenamiento interno de DinD
+=======
+  jenkins-data:
+>>>>>>> fe30db21244edb790e6b2e02bbbf0be2622b51a6

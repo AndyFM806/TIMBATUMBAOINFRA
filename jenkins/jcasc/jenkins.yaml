@@ -14,8 +14,12 @@ jenkins:
         name: "docker"
         dockerApi:
           dockerHost:
+<<<<<<< HEAD
             uri: "tcp://dind:2375" # Se conecta al servicio dind del docker-compose
         exposeDockerHost: true
+=======
+            uri: "tcp://dind:2375"
+>>>>>>> fe30db21244edb790e6b2e02bbbf0be2622b51a6
         templates:
           # === Agente Terraform AWSCLI Checkov ===
           - name: "terraform-agent"
@@ -23,7 +27,7 @@ jenkins:
             remoteFs: "/home/jenkins"
             instanceCapStr: 3
             dockerTemplateBase:
-              image: "custom-agent/terraform" # <-- ¡Usando nuestra imagen local!
+              image: "custom-agent/terraform"
               tty: true
             retentionStrategy:
               idleMinutes: 5
@@ -37,7 +41,7 @@ jenkins:
             remoteFs: "/home/jenkins"
             instanceCapStr: 3
             dockerTemplateBase:
-              image: "custom-agent/node" # <-- ¡Usando nuestra imagen local!
+              image: "custom-agent/node"
               tty: true
             retentionStrategy:
               idleMinutes: 5
@@ -51,7 +55,7 @@ jenkins:
             remoteFs: "/home/jenkins"
             instanceCapStr: 2
             dockerTemplateBase:
-              image: "custom-agent/maven" # <-- ¡Usando nuestra imagen local!
+              image: "custom-agent/maven"
               tty: true
             retentionStrategy:
               idleMinutes: 5
@@ -65,7 +69,7 @@ jenkins:
             remoteFs: "/home/jenkins"
             instanceCapStr: 5
             dockerTemplateBase:
-              image: "custom-agent/docker" # <-- ¡Usando nuestra imagen local!
+              image: "custom-agent/docker"
               tty: true
             retentionStrategy:
               idleMinutes: 10
@@ -79,7 +83,7 @@ credentials:
       - credentials:
           - usernamePassword:
               scope: GLOBAL
-              id: "aws-credentials-00" # <-- ID EXACTO que usa tu Jenkinsfile
+              id: "aws-credentials-00"
               username: "${AWS_ACCESS_KEY_ID}"
               password: "${AWS_SECRET_ACCESS_KEY}"
 
@@ -100,3 +104,14 @@ jobs:
           }
         }
       }
+
+unclassified:
+  location:
+    url: http://localhost:8080/
+  slaveAgentPort: 50000
+
+tool:
+  jdk:
+    installations:
+      - name: 'jdk17'
+        home: '/usr/lib/jvm/java-17-openjdk-amd64'
