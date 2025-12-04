@@ -36,6 +36,7 @@ pipeline {
                 dir('infra') {
                     sh '''
                         echo "[Checkov] Escaneando IaC..."
+                        docker pull bridgecrew/checkov:3
                         docker run --rm \
                           -v "$PWD":/tf \
                           --workdir /tf \
