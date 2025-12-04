@@ -36,12 +36,7 @@ pipeline {
                 dir('infra') {
                     sh '''
                         echo "[Checkov] Escaneando IaC..."
-                        docker pull bridgecrew/checkov:3
-                        docker run --rm \
-                          -v "$PWD":/tf \
-                          --workdir /tf \
-                          bridgecrew/checkov:latest \
-                          -d /tf -o junitxml --output-file-path /tf/results.xml
+                        checkov --directory . -o junitxml --soft-fail --output-file-path results.xml
                     '''
                     junit 'infra/results.xml'
                 }

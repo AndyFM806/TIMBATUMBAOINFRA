@@ -65,7 +65,7 @@ jenkins:
             remoteFs: "/home/jenkins"
             instanceCapStr: 5
             dockerTemplateBase:
-              image: "jenkins/inbound-agent:latest-jdk17"
+              image: "andyfm124/docker-infra-leturia:1.0"
               tty: true
               environment:
                 - "DOCKER_HOST=tcp://dind:2375"
@@ -73,7 +73,7 @@ jenkins:
               idleMinutes: 10
             connector:
               attach:
-                user: "root"
+                user: "jenkins"
 
 unclassified:
   location:
