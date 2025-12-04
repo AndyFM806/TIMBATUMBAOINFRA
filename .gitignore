@@ -8,4 +8,4 @@ node_modules/
 .scannerwork/
 infra/.terraform/
 infra/terraform.tfstate
-infra/*.tfvars
+.env
