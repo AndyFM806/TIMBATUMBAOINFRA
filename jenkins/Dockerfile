@@ -1,16 +1,21 @@
-FROM jenkins/jenkins:jdk21
+FROM jenkins/jenkins:2.426.3-jdk17
 
+# Switch to the root user to install dependencies
 USER root
 
+# Disable the setup wizard
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
 
-# Solo plugins, el YAML se montará desde la máquina host
-COPY plugins.txt /usr/share/jenkins/plugins.txt
-RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/plugins.txt
+# Copy the plugins file and install them
+COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
+RUN jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins.txt
 
-# JCasC leerá este archivo (montado por docker-compose)
+# Set the location of the JCasC configuration file
 ENV CASC_JENKINS_CONFIG=/var/jenkins_home/casc_configs/jenkins.yaml
 
-USER jenkins
-
+# Expose the necessary ports
 EXPOSE 8080 50000
+
+# Healthcheck to ensure Jenkins is ready before proceeding
+HEALTHCHECK --interval=30s --timeout=10s --retries=5 \
+  CMD curl -f http://localhost:8080/login || exit 1

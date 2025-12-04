@@ -1,5 +1,5 @@
 services:
-  # ----- CONSTRUCCIÓN DE AGENTES -----
+  # ----- IMAGE BUILDS -----
   terraform-agent:
     image: custom-agent/terraform
     build:
@@ -20,7 +20,7 @@ services:
     build:
       context: ./agents/docker
 
-  # ----- CONTROLADOR DE JENKINS -----
+  # ----- JENKINS CONTROLLER -----
   jenkins-controller:
     build:
       context: .
@@ -36,17 +36,19 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     depends_on:
       dind:
-        # ¡IMPORTANTE! Ahora espera a que dind esté saludable
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/login"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
 
-  # ----- DOCKER-IN-DOCKER (con correcciones) -----
+  # ----- DOCKER-IN-DOCKER (with healthcheck) -----
   dind:
     image: docker:24.0-dind
     privileged: true
-    # No necesitamos exponer el puerto al host, solo a otros contenedores
     expose:
       - "2375"
-    # ¡IMPORTANTE! Añadimos una prueba de salud
     healthcheck:
       test: ["CMD", "docker", "info"]
       interval: 10s
