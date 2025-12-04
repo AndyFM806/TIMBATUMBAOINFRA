@@ -23,6 +23,7 @@ pipeline {
                     sh '''
                         echo "[TF] Formateando y validando..."
                         terraform fmt -check
+                        terraform init
                         terraform validate
                     '''
                 }
