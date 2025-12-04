@@ -1,26 +1,41 @@
+version: '3.8'
 services:
-  # ----- CONSTRUCCIÓN DE AGENTES -----
+  # ----- CONSTRUCCIÓN Y EJECUCIÓN DE AGENTES -----
+
   terraform-agent:
     image: custom-agent/terraform
-    build:
-      context: ./agents/terraform
+    environment:
+      - JENKINS_URL=http://jenkins-controller:8080/
+    depends_on:
+      jenkins-controller:
+        condition: service_started
 
   node-agent:
     image: custom-agent/node
-    build:
-      context: ./agents/node
-
+    environment:
+      - JENKINS_URL=http://jenkins-controller:8080/
+    depends_on:
+      jenkins-controller:
+        condition: service_started
+  
   maven-agent:
     image: custom-agent/maven
-    build:
-      context: ./agents/maven
+    environment:
+      - JENKINS_URL=http://jenkins-controller:8080/
+    depends_on:
+      jenkins-controller:
+        condition: service_started
 
+  # Agente Docker: Usa la conexión TCP a DinD, que es correcta.
   docker-agent:
     image: custom-agent/docker
-    build:
-      context: ./agents/docker
+    environment:
+      - JENKINS_URL=http://jenkins-controller:8080/
+      - DOCKER_HOST=tcp://dind:2375 # Conexión a DinD por red
+    depends_on:
+      jenkins-controller:
+        condition: service_started
 
-  # ----- CONTROLADOR DE JENKINS -----
   jenkins-controller:
     build:
       context: .
@@ -30,28 +45,46 @@ services:
       - "50000:50000"
     volumes:
       - ./jcasc:/var/jenkins_home/casc_configs
-      - jenkins-data:/var/jenkins_home
+      - jenkins-data:/var/jenkins_home # Volumen de datos persistentes de Jenkins
     environment:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     depends_on:
       dind:
-        # ¡IMPORTANTE! Ahora espera a que dind esté saludable
-        condition: service_healthy
+        condition: service_healthy 
+      image-builder:
+        condition: service_completed_successfully
 
-  # ----- DOCKER-IN-DOCKER (con correcciones) -----
+  # Servicio temporal que construye las imágenes de los agentes en DinD.
+  image-builder:
+    image: docker:24
+    depends_on:
+      dind:
+        condition: service_healthy
+    volumes:
+      - ./:/workdir
+    working_dir: /workdir
+    # El script espera a DinD y luego construye todas las imágenes.
+    entrypoint: [ "sh", "-c",sleep 10, "set -ex; export DOCKER_HOST=tcp://dind:2375; until docker info; do echo 'Waiting for dind...'; sleep 1; done; docker build -t custom-agent/terraform ./agents/terraform; docker build -t custom-agent/node ./agents/node; docker build -t custom-agent/maven ./agents/maven; docker build -t custom-agent/docker ./agents/docker; echo 'Image build complete'; exit 0" ]
+    restart: "no"
+
+  # DOCKER-IN-DOCKER (DinD): Servidor Docker.
   dind:
     image: docker:24.0-dind
+    command: --host=tcp://0.0.0.0:2375
     privileged: true
-    # No necesitamos exponer el puerto al host, solo a otros contenedores
     expose:
-      - "2375"
-    # ¡IMPORTANTE! Añadimos una prueba de salud
+      - "2375" # Puerto para conexión TCP
     healthcheck:
       test: ["CMD", "docker", "info"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    volumes:
+      - dind-data:/var/lib/docker # 🚨 CORRECCIÓN: Uso de volumen con nombre para DinD
+      - ./agents:/build-agents
 
 volumes:
   jenkins-data:
+  dind-data: # 🚨 NUEVA DEFINICIÓN: Volumen con nombre para el almacenamiento interno de DinD

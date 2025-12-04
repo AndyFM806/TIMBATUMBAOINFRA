@@ -1,20 +1,13 @@
-# Usar la imagen oficial de Node.js
-FROM node:18-slim
+# ----------------------------------------------------
+# CAMBIO CLAVE: Usamos la etiqueta que especifica JDK 17
+FROM jenkins/inbound-agent:alpine3.22-jdk17
+# ----------------------------------------------------
 
-# Instalar curl y Java (necesarios para el agente de Jenkins)
-RUN apt-get update && apt-get install -y \
-    curl \
-    openjdk-17-jre-headless \
-    && rm -rf /var/lib/apt/lists/*
+# Cambia a root para instalar herramientas
+USER root
 
-# Instalar el agente de Jenkins
-RUN mkdir -p /usr/share/jenkins
-RUN curl -sL "https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/latest/remoting.jar" -o /usr/share/jenkins/agent.jar \
-    && chmod 755 /usr/share/jenkins/agent.jar
+# Instala Bash, cURL, Unzip, Git, Node.js y npm
+RUN apk add --no-cache bash curl unzip git nodejs npm
 
-# Crear usuario y directorio de trabajo
-RUN useradd -ms /bin/bash jenkins
+# Vuelve al usuario jenkins (práctica recomendada de seguridad)
 USER jenkins
-WORKDIR /home/jenkins
-
-ENTRYPOINT ["java", "-jar", "/usr/share/jenkins/agent.jar"]

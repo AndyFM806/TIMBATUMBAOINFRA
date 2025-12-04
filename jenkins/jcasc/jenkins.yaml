@@ -15,6 +15,7 @@ jenkins:
         dockerApi:
           dockerHost:
             uri: "tcp://dind:2375" # Se conecta al servicio dind del docker-compose
+        exposeDockerHost: true
         templates:
           # === Agente Terraform AWSCLI Checkov ===
           - name: "terraform-agent"
