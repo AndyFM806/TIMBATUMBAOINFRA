@@ -1,37 +1,50 @@
-const { registrarAlumno, buscarAlumno } = require("../src/alumnos");
+const { registrarAlumno, buscarAlumno } = require("../src/alumno");
 
-console.log("==== TEST: alumnos.js ====");
+describe("Manejo de alumnos", () => {
+    // ------------------ Test registrarAlumno (OK) ------------------
+    test("registrarAlumno agrega un alumno a la lista", () => {
+        const lista = [];
+        const alumno = { nombre: "Andy", edad: 20 };
 
-// ------------------ Test registrarAlumno ------------------
-try {
-    const lista = [];
-    const alumno = { nombre: "Andy", edad: 20 };
+        const resultado = registrarAlumno(lista, alumno);
 
-    const resultado = registrarAlumno(lista, alumno);
+        expect(resultado.length).toBe(1);
+        expect(resultado[0].nombre).toBe("Andy");
+        expect(resultado[0].edad).toBe(20);
+    });
 
-    console.assert(resultado.length === 1, "El alumno debe ser agregado");
-    console.assert(resultado[0].nombre === "Andy", "El nombre debe coincidir");
+    // ------------------ Test registrarAlumno (datos incompletos) ------------------
+    test("registrarAlumno lanza error si los datos están incompletos", () => {
+        const lista = [];
+        const alumnoInvalido = { nombre: "SinEdad" }; // falta edad
 
-    console.log("✔ registrarAlumno OK");
-} catch (e) {
-    console.error("✘ registrarAlumno FAIL:", e.message);
-}
+        expect(() => registrarAlumno(lista, alumnoInvalido))
+            .toThrow("Datos del alumno incompletos");
+    });
 
-// ------------------ Test buscarAlumno ------------------
-try {
-    const lista = [
-        { nombre: "Andy", edad: 20 },
-        { nombre: "Luis", edad: 22 }
-    ];
+    // ------------------ Test buscarAlumno (encuentra) ------------------
+    test("buscarAlumno encuentra un alumno existente por nombre", () => {
+        const lista = [
+            { nombre: "Andy", edad: 20 },
+            { nombre: "Luis", edad: 22 }
+        ];
 
-    const alumno = buscarAlumno(lista, "Luis");
+        const alumno = buscarAlumno(lista, "Luis");
 
-    console.assert(alumno !== null, "Debe encontrar el alumno");
-    console.assert(alumno.nombre === "Luis", "El nombre debe coincidir");
+        expect(alumno).not.toBeNull();
+        expect(alumno.nombre).toBe("Luis");
+        expect(alumno.edad).toBe(22);
+    });
 
-    console.log("✔ buscarAlumno OK");
-} catch (e) {
-    console.error("✘ buscarAlumno FAIL:", e.message);
-}
+    // ------------------ Test buscarAlumno (no encuentra) ------------------
+    test("buscarAlumno devuelve null si el alumno no existe", () => {
+        const lista = [
+            { nombre: "Andy", edad: 20 },
+            { nombre: "Luis", edad: 22 }
+        ];
 
-console.log();
+        const alumno = buscarAlumno(lista, "Carlos");
+
+        expect(alumno).toBeNull();
+    });
+});

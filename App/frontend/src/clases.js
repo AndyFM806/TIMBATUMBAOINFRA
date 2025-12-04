@@ -8,12 +8,18 @@
  * @returns {Object}
  */
 function crearClase(nombre, nivel) {
-    if (!nombre || !nivel) {
+    if (
+        typeof nombre !== "string" ||
+        nombre.trim() === "" ||
+        typeof nivel !== "string" ||
+        nivel.trim() === ""
+    ) {
         throw new Error("Nombre y nivel son obligatorios");
     }
+
     return {
-        nombre,
-        nivel,
+        nombre: nombre.trim(),
+        nivel: nivel.trim(),
         alumnosInscritos: []
     };
 }
@@ -26,12 +32,19 @@ function crearClase(nombre, nivel) {
  * @returns {Object} Clase actualizada
  */
 function inscribirAlumnoEnClase(clase, alumno) {
-    if (!clase || !alumno) {
+    if (
+        !clase ||
+        typeof clase !== "object" ||
+        !Array.isArray(clase.alumnosInscritos) ||
+        typeof alumno !== "string" ||
+        alumno.trim() === ""
+    ) {
         throw new Error("Clase o alumno inválidos");
     }
+
     return {
         ...clase,
-        alumnosInscritos: [...clase.alumnosInscritos, alumno]
+        alumnosInscritos: [...clase.alumnosInscritos, alumno.trim()]
     };
 }
 

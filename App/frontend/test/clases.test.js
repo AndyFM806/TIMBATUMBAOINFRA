@@ -1,31 +1,36 @@
 const { crearClase, inscribirAlumnoEnClase } = require("../src/clases");
 
-console.log("==== TEST: clases.js ====");
+describe("Gestión de clases de baile", () => {
+    test("crearClase crea una clase sin alumnos inscritos", () => {
+        const clase = crearClase("Salsa", "Intermedio");
 
-// ------------------ Test crearClase ------------------
-try {
-    const clase = crearClase("Salsa", "Intermedio");
+        expect(clase.nombre).toBe("Salsa");
+        expect(clase.nivel).toBe("Intermedio");
+        expect(Array.isArray(clase.alumnosInscritos)).toBe(true);
+        expect(clase.alumnosInscritos.length).toBe(0);
+    });
 
-    console.assert(clase.nombre === "Salsa", "El nombre debe ser Salsa");
-    console.assert(clase.nivel === "Intermedio", "El nivel debe ser Intermedio");
-    console.assert(Array.isArray(clase.alumnosInscritos), "Debe contener lista de alumnos");
+    test("crearClase lanza error si falta nombre o nivel", () => {
+        expect(() => crearClase("", "Intermedio")).toThrow("Nombre y nivel son obligatorios");
+        expect(() => crearClase("Salsa", "")).toThrow("Nombre y nivel son obligatorios");
+    });
 
-    console.log("✔ crearClase OK");
-} catch (e) {
-    console.error("✘ crearClase FAIL:", e.message);
-}
+    test("inscribirAlumnoEnClase agrega un alumno a la lista", () => {
+        const clase = crearClase("Salsa", "Intermedio");
+        const actualizada = inscribirAlumnoEnClase(clase, "Andy");
 
-// ------------------ Test inscribirAlumnoEnClase ------------------
-try {
-    const clase = crearClase("Salsa", "Intermedio");
-    const claseActualizada = inscribirAlumnoEnClase(clase, "Andy");
+        expect(actualizada.alumnosInscritos.length).toBe(1);
+        expect(actualizada.alumnosInscritos).toContain("Andy");
+        // no muta el original
+        expect(clase.alumnosInscritos.length).toBe(0);
+    });
 
-    console.assert(claseActualizada.alumnosInscritos.length === 1, "Debe tener un alumno inscrito");
-    console.assert(claseActualizada.alumnosInscritos[0] === "Andy", "Debe inscribir Andy");
+    test("inscribirAlumnoEnClase lanza error con datos inválidos", () => {
+        const clase = crearClase("Salsa", "Intermedio");
 
-    console.log("✔ inscribirAlumnoEnClase OK");
-} catch (e) {
-    console.error("✘ inscribirAlumnoEnClase FAIL:", e.message);
-}
-
-console.log();
+        expect(() => inscribirAlumnoEnClase(null, "Andy"))
+            .toThrow("Clase o alumno inválidos");
+        expect(() => inscribirAlumnoEnClase(clase, ""))
+            .toThrow("Clase o alumno inválidos");
+    });
+});
