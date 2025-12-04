@@ -49,11 +49,12 @@ pipeline {
                 dir('App/frontend') {
                     sh '''
                         npm install
-                        npm test -- --unit || true
+                        npm test
                     '''
                 }
             }
         }
+
 
         stage('4. Terraform Plan (preview)') {
             agent { label 'terraform' }
