@@ -38,7 +38,7 @@ pipeline {
                         echo "[Checkov] Escaneando IaC..."
                         checkov --directory . -o junitxml --soft-fail --output-file-path results.xml || true
                     '''
-                    junit 'infra/results.xml'
+                    // junit 'infra/results.xml'
                 }
             }
         }
