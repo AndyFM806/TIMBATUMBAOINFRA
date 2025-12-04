@@ -1,5 +1,38 @@
 services:
-  # ----- JENKINS CONTROLLER & DIND (Default services) -----
+  # ----- DOCKER DAEMON -----
+  dind:
+    image: docker:24.0-dind
+    privileged: true
+    expose:
+      - "2375"
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    healthcheck:
+      test: ["CMD", "docker", "info"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ----- BUILDER AUTOMÁTICO -----
+  agent-builder:
+    image: docker:24.0-cli
+    depends_on:
+      dind:
+        condition: service_healthy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./agents:/agents
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      echo ">> Construyendo imágenes de agentes dentro del dind..."
+      docker build -t custom-agent/terraform /agents/terraform
+      docker build -t custom-agent/node /agents/node
+      docker build -t custom-agent/maven /agents/maven
+      docker build -t custom-agent/docker /agents/docker
+      echo ">> Imágenes listas!"
+    restart: "no"
+
+  # ----- JENKINS CONTROLLER -----
   jenkins-controller:
     build:
       context: .
@@ -7,55 +40,22 @@ services:
     ports:
       - "8080:8080"
       - "50000:50000"
-    volumes:
-      - ./jcasc:/var/jenkins_home/casc_configs
-      - jenkins-data:/var/jenkins_home
     env_file:
       - ./.env
+    volumes:
+      - jenkins-data:/var/jenkins_home
+      - ./jcasc:/var/jenkins_home/casc_configs:ro
+
     depends_on:
       dind:
         condition: service_healthy
+      agent-builder:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/login"]
       interval: 10s
       timeout: 5s
       retries: 30
-
-  dind:
-    image: docker:24.0-dind
-    privileged: true
-    expose:
-      - "2375"
-    healthcheck:
-      test: ["CMD", "docker", "info"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # ----- AGENT IMAGE BUILDS (Assigned to the 'agents' profile to prevent auto-starting) -----
-  terraform-agent:
-    image: custom-agent/terraform
-    build:
-      context: ./agents/terraform
-    profiles: ["agents"]
-
-  node-agent:
-    image: custom-agent/node
-    build:
-      context: ./agents/node
-    profiles: ["agents"]
-
-  maven-agent:
-    image: custom-agent/maven
-    build:
-      context: ./agents/maven
-    profiles: ["agents"]
-
-  docker-agent:
-    image: custom-agent/docker
-    build:
-      context: ./agents/docker
-    profiles: ["agents"]
-
 volumes:
   jenkins-data:
+  jenkins-docker-certs:

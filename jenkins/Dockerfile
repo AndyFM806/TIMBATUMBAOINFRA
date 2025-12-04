@@ -3,6 +3,9 @@ FROM jenkins/jenkins:latest-jdk17
 # Switch to the root user to install dependencies
 USER root
 
+# Install git
+RUN apt-get update && apt-get install -y git
+
 # Disable the setup wizard
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
 

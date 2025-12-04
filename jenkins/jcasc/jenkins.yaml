@@ -28,9 +28,8 @@ jenkins:
             retentionStrategy:
               idleMinutes: 5
             connector:
-              attach:
-                user: "jenkins"
-          
+              jnlp: {}
+
           # === Agente NodeJS ===
           - name: "node-agent"
             labelString: "node"
@@ -42,8 +41,7 @@ jenkins:
             retentionStrategy:
               idleMinutes: 5
             connector:
-              attach:
-                user: "jenkins"
+              jnlp: {}
 
           # === Agente Maven (Java) ===
           - name: "maven-agent"
@@ -56,9 +54,8 @@ jenkins:
             retentionStrategy:
               idleMinutes: 5
             connector:
-              attach:
-                user: "jenkins"
-                
+              jnlp: {}
+
           # === Agente Docker CLI ===
           - name: "docker-agent"
             labelString: "docker"
@@ -67,11 +64,12 @@ jenkins:
             dockerTemplateBase:
               image: "custom-agent/docker"
               tty: true
+              environment:
+                - "DOCKER_HOST=tcp://dind:2375"
             retentionStrategy:
               idleMinutes: 10
             connector:
-              attach:
-                user: "jenkins"
+              jnlp: {}
 
 unclassified:
   location:
@@ -106,6 +104,10 @@ jobs:
       }
 
 tool:
+  git:
+    installations:
+      - name: "git"
+        home: "/usr/bin/git"
   jdk:
     installations:
       - name: 'jdk17'

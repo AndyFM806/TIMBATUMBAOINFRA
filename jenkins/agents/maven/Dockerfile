@@ -1,13 +1,8 @@
-# Use an official Maven image that already includes JDK 17
-FROM maven:3.9-eclipse-temurin-17
+FROM jenkins/inbound-agent:alpine-jdk17
 
-# Switch to root to install necessary tools
 USER root
 
-# Install Jenkins agent dependencies
-RUN apt-get update && apt-get install -y openssh-client
+# Install Maven
+RUN apk add --no-cache maven
 
-# Create a Jenkins user and working directory
-RUN useradd -ms /bin/bash jenkins
 USER jenkins
-WORKDIR /home/jenkins
