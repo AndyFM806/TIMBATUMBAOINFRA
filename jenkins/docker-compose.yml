@@ -45,7 +45,6 @@ services:
     volumes:
       - jenkins-data:/var/jenkins_home
       - ./jcasc:/var/jenkins_home/casc_configs:ro
-
     depends_on:
       dind:
         condition: service_healthy
@@ -56,6 +55,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 30
+
 volumes:
   jenkins-data:
   jenkins-docker-certs:

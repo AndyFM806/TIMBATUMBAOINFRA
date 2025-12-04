@@ -23,12 +23,13 @@ jenkins:
             remoteFs: "/home/jenkins"
             instanceCapStr: 3
             dockerTemplateBase:
-              image: "custom-agent/terraform"
+              image: "andyfm124/terraform-infra-leturia:1.0"
               tty: true
             retentionStrategy:
               idleMinutes: 5
             connector:
-              jnlp: {}
+              attach:
+                user: "root"
 
           # === Agente NodeJS ===
           - name: "node-agent"
@@ -36,12 +37,13 @@ jenkins:
             remoteFs: "/home/jenkins"
             instanceCapStr: 3
             dockerTemplateBase:
-              image: "custom-agent/node"
+              image: "andyfm124/node-infra-leturia:1.0"
               tty: true
             retentionStrategy:
               idleMinutes: 5
             connector:
-              jnlp: {}
+              attach:
+                user: "root"
 
           # === Agente Maven (Java) ===
           - name: "maven-agent"
@@ -49,12 +51,13 @@ jenkins:
             remoteFs: "/home/jenkins"
             instanceCapStr: 2
             dockerTemplateBase:
-              image: "custom-agent/maven"
+              image: "jenkinsciinfra/inbound-agent-maven"
               tty: true
             retentionStrategy:
               idleMinutes: 5
             connector:
-              jnlp: {}
+              attach:
+                user: "root"
 
           # === Agente Docker CLI ===
           - name: "docker-agent"
@@ -62,14 +65,15 @@ jenkins:
             remoteFs: "/home/jenkins"
             instanceCapStr: 5
             dockerTemplateBase:
-              image: "custom-agent/docker"
+              image: "jenkins/inbound-agent:latest-jdk17"
               tty: true
               environment:
                 - "DOCKER_HOST=tcp://dind:2375"
             retentionStrategy:
               idleMinutes: 10
             connector:
-              jnlp: {}
+              attach:
+                user: "root"
 
 unclassified:
   location:
@@ -96,6 +100,7 @@ jobs:
                   url('https://github.com/AndyFM806/TIMBATUMBAOINFRA.git')
                 }
                 branches('*/main')
+                gitTool: "git"
               }
             }
             scriptPath('pipelines/Jenkinsfile')

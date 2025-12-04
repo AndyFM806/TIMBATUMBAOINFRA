@@ -10,7 +10,7 @@ pipeline {
     stages {
 
         stage('Checkout') {
-            agent { label 'terraform' }
+            agent { label 'docker' }
             steps {
                 checkout scm
             }
