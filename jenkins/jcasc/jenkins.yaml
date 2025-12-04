@@ -1,5 +1,6 @@
 jenkins:
   systemMessage: "Jenkins a medida para TimbaTumbao ✨"
+  slaveAgentPort: 50000
   securityRealm:
     local:
       allowsSignup: false
@@ -14,12 +15,7 @@ jenkins:
         name: "docker"
         dockerApi:
           dockerHost:
-<<<<<<< HEAD
-            uri: "tcp://dind:2375" # Se conecta al servicio dind del docker-compose
-        exposeDockerHost: true
-=======
             uri: "tcp://dind:2375"
->>>>>>> fe30db21244edb790e6b2e02bbbf0be2622b51a6
         templates:
           # === Agente Terraform AWSCLI Checkov ===
           - name: "terraform-agent"
@@ -77,6 +73,10 @@ jenkins:
               attach:
                 user: "jenkins"
 
+unclassified:
+  location:
+    url: "http://jenkins-controller:8080/"
+
 credentials:
   system:
     domainCredentials:
@@ -104,11 +104,6 @@ jobs:
           }
         }
       }
-
-unclassified:
-  location:
-    url: http://localhost:8080/
-  slaveAgentPort: 50000
 
 tool:
   jdk:

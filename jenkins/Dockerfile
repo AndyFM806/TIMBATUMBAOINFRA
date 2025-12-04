@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:2.426.3-jdk17
+FROM jenkins/jenkins:latest-jdk17
 
 # Switch to the root user to install dependencies
 USER root

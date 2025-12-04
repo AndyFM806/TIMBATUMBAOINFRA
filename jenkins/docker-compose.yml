@@ -1,40 +1,5 @@
-version: '3.8'
 services:
-  terraform-agent:
-    image: custom-agent/terraform
-    environment:
-      - JENKINS_URL=http://jenkins-controller:8080/
-    depends_on:
-      jenkins-controller:
-        condition: service_started
-
-  node-agent:
-    image: custom-agent/node
-    environment:
-      - JENKINS_URL=http://jenkins-controller:8080/
-    depends_on:
-      jenkins-controller:
-        condition: service_started
-  
-  maven-agent:
-    image: custom-agent/maven
-    environment:
-      - JENKINS_URL=http://jenkins-controller:8080/
-    depends_on:
-      jenkins-controller:
-        condition: service_started
-
-  # Agente Docker: Usa la conexión TCP a DinD, que es correcta.
-  docker-agent:
-    image: custom-agent/docker
-    environment:
-      - JENKINS_URL=http://jenkins-controller:8080/
-      - DOCKER_HOST=tcp://dind:2375 # Conexión a DinD por red
-    depends_on:
-      jenkins-controller:
-        condition: service_started
-
-  # ----- JENKINS CONTROLLER -----
+  # ----- JENKINS CONTROLLER & DIND (Default services) -----
   jenkins-controller:
     build:
       context: .
@@ -44,10 +9,9 @@ services:
       - "50000:50000"
     volumes:
       - ./jcasc:/var/jenkins_home/casc_configs
-      - jenkins-data:/var/jenkins_home # Volumen de datos persistentes de Jenkins
-    environment:
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - jenkins-data:/var/jenkins_home
+    env_file:
+      - ./.env
     depends_on:
       dind:
         condition: service_healthy
@@ -57,10 +21,8 @@ services:
       timeout: 5s
       retries: 30
 
-  # ----- DOCKER-IN-DOCKER (with healthcheck) -----
   dind:
     image: docker:24.0-dind
-    command: --host=tcp://0.0.0.0:2375
     privileged: true
     expose:
       - "2375"
@@ -69,10 +31,31 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
-    volumes:
-      - dind-data:/var/lib/docker # 🚨 CORRECCIÓN: Uso de volumen con nombre para DinD
-      - ./agents:/build-agents
+
+  # ----- AGENT IMAGE BUILDS (Assigned to the 'agents' profile to prevent auto-starting) -----
+  terraform-agent:
+    image: custom-agent/terraform
+    build:
+      context: ./agents/terraform
+    profiles: ["agents"]
+
+  node-agent:
+    image: custom-agent/node
+    build:
+      context: ./agents/node
+    profiles: ["agents"]
+
+  maven-agent:
+    image: custom-agent/maven
+    build:
+      context: ./agents/maven
+    profiles: ["agents"]
+
+  docker-agent:
+    image: custom-agent/docker
+    build:
+      context: ./agents/docker
+    profiles: ["agents"]
 
 volumes:
   jenkins-data:
